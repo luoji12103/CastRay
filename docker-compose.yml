@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  castray:
+    build: .
+    container_name: castray-system
+    hostname: castray-node
+    restart: unless-stopped
+    network_mode: "host"  # 使用主机网络以便连接到已有Ray集群
+    environment:
+      - RAY_ADDRESS=${RAY_ADDRESS:-auto}
+      - PYTHONPATH=/opt/castray-system
+      - CASTRAY_CONFIG=/opt/castray-system/config_linux.json
+      - RAY_DISABLE_IMPORT_WARNING=1
+    volumes:
+      - ./config_linux.json:/opt/castray-system/config_linux.json:ro
+      - castray_downloads:/opt/castray-system/downloads
+      - castray_logs:/opt/castray-system/logs
+      - /tmp/ray:/tmp/ray:rw  # 共享Ray临时目录
+    depends_on:
+      - ray-health-check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+  # Ray集群健康检查服务
+  ray-health-check:
+    image: rayproject/ray:2.48.0
+    container_name: ray-health-check
+    network_mode: "host"
+    command: >
+      bash -c "
+        echo '检查Ray集群状态...' &&
+        ray status --address=${RAY_ADDRESS:-auto} &&
+        echo 'Ray集群连接正常' ||
+        (echo 'Ray集群连接失败，请确保Ray集群已启动' && exit 1)
+      "
+    environment:
+      - RAY_ADDRESS=${RAY_ADDRESS:-auto}
+    volumes:
+      - /tmp/ray:/tmp/ray:ro
+    restart: "no"
+
+volumes:
+  castray_downloads:
+    driver: local
+  castray_logs:
+    driver: local
+
+# 网络配置（如果不使用host网络）
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

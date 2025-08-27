@@ -1,0 +1,45 @@
+{
+    "ray_cluster": {
+        "address": "auto",
+        "namespace": "castray",
+        "create_demo_nodes": false,
+        "runtime_env": {
+            "working_dir": "/opt/castray-system",
+            "env_vars": {
+                "PYTHONPATH": "/opt/castray-system",
+                "RAY_DISABLE_IMPORT_WARNING": "1"
+            }
+        }
+    },
+    "web_server": {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "log_level": "info"
+    },
+    "file_transfer": {
+        "chunk_size": 65536,
+        "max_file_size": 1073741824,
+        "timeout": 300,
+        "download_dir": "/opt/castray-system/downloads"
+    },
+    "networking": {
+        "udp_port_range": [9000, 9999],
+        "multicast_group": "224.1.1.1",
+        "multicast_port": 9999
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "/opt/castray-system/logs/castray.log",
+        "max_size": 104857600,
+        "backup_count": 5
+    },
+    "demo_files": {
+        "enabled": true,
+        "directory": "/opt/castray-system/demo_files",
+        "files": [
+            "config.json",
+            "data.txt", 
+            "report.md"
+        ]
+    }
+}
