@@ -131,32 +131,32 @@ Channel WORKER_OBJECT_LOCATIONS_CHANNEL
 - cumulative processed messages: 0
 num async plasma notifications: 0
 Event stats:
-Global stats: 37753 total (23 active)
-Queueing time: mean = 52.592 ms, max = 5.027 s, min = -0.000 s, total = 1985.516 s
-Execution time:  mean = 15.881 ms, total = 599.567 s
+Global stats: 40697 total (25 active)
+Queueing time: mean = 52.758 ms, max = 5.031 s, min = -0.000 s, total = 2147.092 s
+Execution time:  mean = 14.737 ms, total = 599.739 s
 Event stats:
-	NodeManager.CheckGC - 5747 total (1 active), Execution time: mean = 6.630 us, total = 38.103 ms, Queueing time: mean = 7.986 ms, max = 27.458 ms, min = 2.207 ms, total = 45.895 s
-	RaySyncer.OnDemandBroadcasting - 5747 total (1 active), Execution time: mean = 11.060 us, total = 63.561 ms, Queueing time: mean = 7.981 ms, max = 27.497 ms, min = 2.208 ms, total = 45.868 s
-	ObjectManager.UpdateAvailableMemory - 5746 total (0 active), Execution time: mean = 4.338 us, total = 24.925 ms, Queueing time: mean = 36.521 us, max = 5.657 ms, min = 2.000 us, total = 209.851 ms
-	NodeManagerService.grpc_server.ReportWorkerBacklog - 5517 total (0 active), Execution time: mean = 274.189 us, total = 1.513 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
-	NodeManagerService.grpc_server.ReportWorkerBacklog.HandleRequestImpl - 5517 total (0 active), Execution time: mean = 22.324 us, total = 123.161 ms, Queueing time: mean = 96.989 us, max = 17.233 ms, min = 1.800 us, total = 535.089 ms
-	RayletWorkerPool.deadline_timer.kill_idle_workers - 3002 total (1 active), Execution time: mean = 14.261 us, total = 42.812 ms, Queueing time: mean = 6.728 ms, max = 43.854 ms, min = -0.000 s, total = 20.198 s
-	ClientConnection.async_read.ProcessMessageHeader - 1128 total (9 active), Execution time: mean = 7.184 us, total = 8.104 ms, Queueing time: mean = 1.640 s, max = 5.027 s, min = 63.800 us, total = 1850.308 s
-	ClientConnection.async_read.ProcessMessage - 1119 total (0 active), Execution time: mean = 40.327 us, total = 45.126 ms, Queueing time: mean = 21.024 us, max = 186.500 us, min = 2.100 us, total = 23.526 ms
-	NodeManager.deadline_timer.flush_free_objects - 616 total (1 active), Execution time: mean = 4.369 us, total = 2.691 ms, Queueing time: mean = 7.687 ms, max = 18.693 ms, min = -0.000 s, total = 4.735 s
-	NodeManager.CheckForUnexpectedWorkerDisconnects - 616 total (1 active), Execution time: mean = 14.977 us, total = 9.226 ms, Queueing time: mean = 7.684 ms, max = 18.702 ms, min = -0.000 s, total = 4.733 s
-	NodeManagerService.grpc_server.GetResourceLoad - 616 total (0 active), Execution time: mean = 249.678 us, total = 153.802 ms, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
-	NodeManager.deadline_timer.spill_objects_when_over_threshold - 616 total (1 active), Execution time: mean = 4.552 us, total = 2.804 ms, Queueing time: mean = 7.687 ms, max = 18.711 ms, min = -0.000 s, total = 4.735 s
-	NodeManager.ScheduleAndDispatchTasks - 616 total (1 active), Execution time: mean = 6.596 us, total = 4.063 ms, Queueing time: mean = 7.693 ms, max = 18.675 ms, min = -0.000 s, total = 4.739 s
-	NodeManagerService.grpc_server.GetResourceLoad.HandleRequestImpl - 616 total (0 active), Execution time: mean = 53.177 us, total = 32.757 ms, Queueing time: mean = 45.302 us, max = 2.194 ms, min = 4.700 us, total = 27.906 ms
-	ClusterResourceManager.ResetRemoteNodeView - 207 total (1 active), Execution time: mean = 10.984 us, total = 2.274 ms, Queueing time: mean = 8.261 ms, max = 27.300 ms, min = -0.000 s, total = 1.710 s
-	NodeManager.deadline_timer.record_metrics - 124 total (1 active), Execution time: mean = 292.799 us, total = 36.307 ms, Queueing time: mean = 7.969 ms, max = 15.251 ms, min = 20.500 us, total = 988.172 ms
-	NodeManager.deadline_timer.debug_state_dump - 62 total (1 active, 1 running), Execution time: mean = 1.477 ms, total = 91.598 ms, Queueing time: mean = 7.628 ms, max = 42.559 ms, min = -0.000 s, total = 472.954 ms
+	NodeManager.CheckGC - 6211 total (1 active), Execution time: mean = 6.609 us, total = 41.050 ms, Queueing time: mean = 7.973 ms, max = 27.458 ms, min = 2.207 ms, total = 49.521 s
+	RaySyncer.OnDemandBroadcasting - 6211 total (1 active), Execution time: mean = 10.971 us, total = 68.141 ms, Queueing time: mean = 7.969 ms, max = 27.497 ms, min = 2.208 ms, total = 49.493 s
+	ObjectManager.UpdateAvailableMemory - 6210 total (0 active), Execution time: mean = 4.233 us, total = 26.289 ms, Queueing time: mean = 35.448 us, max = 5.657 ms, min = 1.700 us, total = 220.133 ms
+	NodeManagerService.grpc_server.ReportWorkerBacklog - 5967 total (0 active), Execution time: mean = 273.910 us, total = 1.634 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	NodeManagerService.grpc_server.ReportWorkerBacklog.HandleRequestImpl - 5967 total (0 active), Execution time: mean = 22.230 us, total = 132.647 ms, Queueing time: mean = 95.749 us, max = 17.233 ms, min = 1.800 us, total = 571.334 ms
+	RayletWorkerPool.deadline_timer.kill_idle_workers - 3243 total (1 active), Execution time: mean = 14.199 us, total = 46.047 ms, Queueing time: mean = 6.797 ms, max = 43.854 ms, min = -0.000 s, total = 22.042 s
+	ClientConnection.async_read.ProcessMessageHeader - 1166 total (9 active), Execution time: mean = 7.235 us, total = 8.436 ms, Queueing time: mean = 1.716 s, max = 5.031 s, min = 63.800 us, total = 2000.801 s
+	ClientConnection.async_read.ProcessMessage - 1157 total (0 active), Execution time: mean = 39.347 us, total = 45.525 ms, Queueing time: mean = 20.937 us, max = 186.500 us, min = 2.100 us, total = 24.224 ms
+	NodeManager.deadline_timer.flush_free_objects - 666 total (1 active), Execution time: mean = 4.302 us, total = 2.865 ms, Queueing time: mean = 7.736 ms, max = 18.693 ms, min = -0.000 s, total = 5.152 s
+	NodeManager.CheckForUnexpectedWorkerDisconnects - 666 total (1 active), Execution time: mean = 14.797 us, total = 9.855 ms, Queueing time: mean = 7.733 ms, max = 18.702 ms, min = -0.000 s, total = 5.150 s
+	NodeManagerService.grpc_server.GetResourceLoad - 666 total (1 active), Execution time: mean = 247.074 us, total = 164.552 ms, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	NodeManager.deadline_timer.spill_objects_when_over_threshold - 666 total (1 active), Execution time: mean = 4.506 us, total = 3.001 ms, Queueing time: mean = 7.736 ms, max = 18.711 ms, min = -0.000 s, total = 5.152 s
+	NodeManager.ScheduleAndDispatchTasks - 666 total (1 active), Execution time: mean = 7.105 us, total = 4.732 ms, Queueing time: mean = 7.741 ms, max = 18.675 ms, min = -0.000 s, total = 5.155 s
+	NodeManagerService.grpc_server.GetResourceLoad.HandleRequestImpl - 666 total (1 active), Execution time: mean = 52.474 us, total = 34.948 ms, Queueing time: mean = 42.797 us, max = 2.194 ms, min = 4.700 us, total = 28.503 ms
+	ClusterResourceManager.ResetRemoteNodeView - 223 total (1 active), Execution time: mean = 10.789 us, total = 2.406 ms, Queueing time: mean = 8.231 ms, max = 27.300 ms, min = -0.000 s, total = 1.835 s
+	NodeManager.deadline_timer.record_metrics - 134 total (1 active), Execution time: mean = 290.855 us, total = 38.975 ms, Queueing time: mean = 8.041 ms, max = 15.251 ms, min = 20.500 us, total = 1.078 s
+	NodeManager.deadline_timer.debug_state_dump - 67 total (1 active, 1 running), Execution time: mean = 1.491 ms, total = 99.897 ms, Queueing time: mean = 7.685 ms, max = 42.559 ms, min = -0.000 s, total = 514.902 ms
 	PeriodicalRunner.RunFnPeriodically - 13 total (0 active), Execution time: mean = 310.600 us, total = 4.038 ms, Queueing time: mean = 5.421 ms, max = 15.025 ms, min = 40.300 us, total = 70.476 ms
-	ray::rpc::NodeInfoGcsService.grpc_client.CheckAlive.OnReplyReceived - 11 total (0 active), Execution time: mean = 20.645 us, total = 227.100 us, Queueing time: mean = 602.100 us, max = 927.200 us, min = 8.300 us, total = 6.623 ms
-	ray::rpc::NodeInfoGcsService.grpc_client.CheckAlive - 11 total (0 active), Execution time: mean = 581.136 us, total = 6.393 ms, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
-	NodeManager.GcsCheckAlive - 11 total (1 active), Execution time: mean = 251.573 us, total = 2.767 ms, Queueing time: mean = 14.462 ms, max = 71.861 ms, min = 5.538 ms, total = 159.077 ms
-	NodeManager.deadline_timer.print_event_loop_stats - 11 total (1 active), Execution time: mean = 6.411 ms, total = 70.517 ms, Queueing time: mean = 8.438 ms, max = 13.245 ms, min = 4.793 ms, total = 92.820 ms
+	ray::rpc::NodeInfoGcsService.grpc_client.CheckAlive.OnReplyReceived - 12 total (0 active), Execution time: mean = 20.400 us, total = 244.800 us, Queueing time: mean = 606.100 us, max = 927.200 us, min = 8.300 us, total = 7.273 ms
+	ray::rpc::NodeInfoGcsService.grpc_client.CheckAlive - 12 total (0 active), Execution time: mean = 568.742 us, total = 6.825 ms, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	NodeManager.GcsCheckAlive - 12 total (1 active), Execution time: mean = 246.100 us, total = 2.953 ms, Queueing time: mean = 13.953 ms, max = 71.861 ms, min = 5.538 ms, total = 167.430 ms
+	NodeManager.deadline_timer.print_event_loop_stats - 12 total (1 active), Execution time: mean = 5.952 ms, total = 71.424 ms, Queueing time: mean = 8.354 ms, max = 13.245 ms, min = 4.793 ms, total = 100.249 ms
 	ClientConnection.async_write.DoAsyncWrites - 10 total (0 active), Execution time: mean = 1.690 us, total = 16.900 us, Queueing time: mean = 109.970 us, max = 178.100 us, min = 69.500 us, total = 1.100 ms
 	ObjectManager.ObjectAdded - 9 total (0 active), Execution time: mean = 11.144 us, total = 100.300 us, Queueing time: mean = 14.078 us, max = 44.100 us, min = 7.200 us, total = 126.700 us
 	NodeManagerService.grpc_server.GetSystemConfig.HandleRequestImpl - 9 total (0 active), Execution time: mean = 59.022 us, total = 531.200 us, Queueing time: mean = 18.056 us, max = 62.100 us, min = 9.100 us, total = 162.500 us
@@ -184,4 +184,4 @@ Event stats:
 	ray::rpc::NodeInfoGcsService.grpc_client.RegisterNode - 1 total (0 active), Execution time: mean = 1.800 ms, total = 1.800 ms, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
 	ray::rpc::NodeInfoGcsService.grpc_client.RegisterNode.OnReplyReceived - 1 total (0 active), Execution time: mean = 564.500 us, total = 564.500 us, Queueing time: mean = 31.500 us, max = 31.500 us, min = 31.500 us, total = 31.500 us
 	ray::rpc::JobInfoGcsService.grpc_client.AddJob - 1 total (0 active), Execution time: mean = 953.200 us, total = 953.200 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
-DebugString() time ms: 1
+DebugString() time ms: 0
