@@ -236,3 +236,5 @@ Other Stats:
 [2025-08-28 14:34:50,364 I 132740 76504] core_worker_process.cc:237: Destructing CoreWorkerProcessImpl. pid: 132740
 [2025-08-28 14:34:50,365 I 132740 76504] io_service_pool.cc:49: IOServicePool is stopped.
 [2025-08-28 14:34:50,484 I 132740 76504] stats.h:136: Stats module has shutdown.
+[2025-08-28 14:35:04,948 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:35:35,245 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
