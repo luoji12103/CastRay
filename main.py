@@ -359,10 +359,24 @@ async def trigger_manual_transfer(request: dict):
         transfer_results = []
         for recipient_id in valid_recipients:
             try:
-                result = await sender_node.initiate_file_transfer(
-                    target_node_id=recipient_id,
-                    file_path=file_name,
-                    transfer_type="manual"
+                # 构建完整的文件路径
+                demo_files_dir = Path("demo_files")
+                file_path = demo_files_dir / file_name
+                
+                # 检查文件是否存在
+                if not file_path.exists():
+                    transfer_results.append({
+                        "recipient": recipient_id,
+                        "success": False,
+                        "message": f"文件不存在: {file_path}"
+                    })
+                    continue
+                
+                # 调用Ray节点的文件传输方法（修正参数）
+                result = await sender_node.initiate_file_transfer.remote(
+                    str(file_path),  # file_path
+                    [recipient_id],  # recipients (列表)
+                    "unicast"       # transfer_mode
                 )
                 transfer_results.append({
                     "recipient": recipient_id,

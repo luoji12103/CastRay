@@ -238,3 +238,52 @@ Other Stats:
 [2025-08-28 14:34:50,484 I 132740 76504] stats.h:136: Stats module has shutdown.
 [2025-08-28 14:35:04,948 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
 [2025-08-28 14:35:35,245 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:35:41,264 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:36:11,447 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:36:17,465 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:36:47,719 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:36:53,736 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:37:23,954 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:37:29,963 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:38:00,189 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:38:06,205 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:38:36,418 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:38:42,423 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:39:12,712 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:39:18,721 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:39:48,958 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:39:54,964 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:40:25,221 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:40:31,225 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:41:01,439 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:41:07,455 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:41:37,650 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:41:43,657 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:42:13,896 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:42:19,912 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:42:50,208 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:42:56,222 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:43:26,466 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:43:32,479 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:44:02,717 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:44:08,733 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:44:38,960 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:44:44,970 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:45:15,179 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:45:21,184 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:45:51,409 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:45:57,417 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:46:27,645 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:46:33,662 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:47:03,868 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:47:20,194 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:47:50,429 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:47:56,438 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:48:26,670 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:48:32,677 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:49:02,907 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:49:08,919 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:49:39,134 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:49:45,148 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 14:50:15,387 W 132740 76504] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 14:50:21,391 W 132740 76504] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.

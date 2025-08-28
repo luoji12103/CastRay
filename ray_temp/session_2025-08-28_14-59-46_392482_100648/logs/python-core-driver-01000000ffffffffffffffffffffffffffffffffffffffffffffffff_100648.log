@@ -1,0 +1,100 @@
+[2025-08-28 14:59:49,455 I 100648 25748] core_worker_process.cc:192: Constructing CoreWorkerProcess. pid: 100648
+[2025-08-28 14:59:49,459 I 100648 25748] io_service_pool.cc:37: IOServicePool is running with 1 io_service.
+[2025-08-28 14:59:52,965 I 100648 25748] grpc_server.cc:140: driver server started, listening on port 62798.
+[2025-08-28 14:59:52,966 I 100648 25748] core_worker.cc:544: Initializing worker at address: 127.0.0.1:62798 worker_id=01000000ffffffffffffffffffffffffffffffffffffffffffffffff node_id=5c0b3c063f200ec0e70e6c90ac54f017eaaa202329387a371b0d9053
+[2025-08-28 14:59:52,968 I 100648 25748] task_event_buffer.cc:287: Reporting task events to GCS every 1000ms.
+[2025-08-28 14:59:52,969 I 100648 25100] accessor.cc:784: Received notification for node, IsAlive = 1 node_id=5c0b3c063f200ec0e70e6c90ac54f017eaaa202329387a371b0d9053
+[2025-08-28 14:59:52,969 I 100648 25100] core_worker.cc:5148: Number of alive nodes:1
+[2025-08-28 14:59:52,971 I 100648 25100] core_worker.cc:915: Event stats:
+
+
+Global stats: 10 total (3 active)
+Queueing time: mean = 3.950 us, max = 11.700 us, min = 8.200 us, total = 39.500 us
+Execution time:  mean = 172.670 us, total = 1.727 ms
+Event stats:
+	PeriodicalRunner.RunFnPeriodically - 2 total (1 active, 1 running), Execution time: mean = 7.100 us, total = 14.200 us, Queueing time: mean = 4.600 us, max = 9.200 us, min = 9.200 us, total = 9.200 us
+	ray::rpc::NodeInfoGcsService.grpc_client.GetAllNodeInfo.OnReplyReceived - 1 total (0 active), Execution time: mean = 87.000 us, total = 87.000 us, Queueing time: mean = 8.200 us, max = 8.200 us, min = 8.200 us, total = 8.200 us
+	Publisher.CheckDeadSubscribers - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberPoll - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberCommandBatch.OnReplyReceived - 1 total (0 active), Execution time: mean = 167.500 us, total = 167.500 us, Queueing time: mean = 10.400 us, max = 10.400 us, min = 10.400 us, total = 10.400 us
+	ray::rpc::WorkerInfoGcsService.grpc_client.AddWorkerInfo - 1 total (0 active), Execution time: mean = 550.300 us, total = 550.300 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::WorkerInfoGcsService.grpc_client.AddWorkerInfo.OnReplyReceived - 1 total (0 active), Execution time: mean = 16.200 us, total = 16.200 us, Queueing time: mean = 11.700 us, max = 11.700 us, min = 11.700 us, total = 11.700 us
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberCommandBatch - 1 total (0 active), Execution time: mean = 482.600 us, total = 482.600 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::NodeInfoGcsService.grpc_client.GetAllNodeInfo - 1 total (0 active), Execution time: mean = 408.900 us, total = 408.900 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+
+-----------------
+Task execution event stats:
+
+Global stats: 0 total (0 active)
+Queueing time: mean = -nan(ind) s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+Execution time:  mean = -nan(ind) s, total = 0.000 s
+Event stats:
+
+-----------------
+Task Event stats:
+
+IO Service Stats:
+
+Global stats: 4 total (1 active)
+Queueing time: mean = 5.925 us, max = 12.000 us, min = 11.700 us, total = 23.700 us
+Execution time:  mean = 191.225 us, total = 764.900 us
+Event stats:
+	CoreWorker.deadline_timer.flush_task_events - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	PeriodicalRunner.RunFnPeriodically - 1 total (0 active), Execution time: mean = 159.700 us, total = 159.700 us, Queueing time: mean = 11.700 us, max = 11.700 us, min = 11.700 us, total = 11.700 us
+	ray::rpc::TaskInfoGcsService.grpc_client.AddTaskEventData - 1 total (0 active), Execution time: mean = 592.500 us, total = 592.500 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::TaskInfoGcsService.grpc_client.AddTaskEventData.OnReplyReceived - 1 total (0 active), Execution time: mean = 12.700 us, total = 12.700 us, Queueing time: mean = 12.000 us, max = 12.000 us, min = 12.000 us, total = 12.000 us
+Other Stats:
+	grpc_in_progress:0
+	current number of task status events in buffer: 1
+	current number of profile events in buffer: 0
+	current number of dropped task attempts tracked: 0
+	total task events sent: 0 MiB
+	total number of task attempts sent: 0
+	total number of task attempts dropped reported: 0
+	total number of sent failure: 0
+	num status task events dropped: 0
+	num profile task events dropped: 0
+
+
+[2025-08-28 14:59:52,975 I 100648 25748] event.cc:500: Ray Event initialized for CORE_WORKER
+[2025-08-28 14:59:52,976 I 100648 25748] event.cc:500: Ray Event initialized for EXPORT_TASK
+[2025-08-28 14:59:52,976 I 100648 25748] event.cc:331: Set ray event level to warning
+[2025-08-28 14:59:53,064 I 100648 25748] actor_task_submitter.cc:73: Set actor max pending calls to -1 actor_id=1542486ac0fc3f2be3665c5201000000
+[2025-08-28 14:59:53,068 I 100648 25100] actor_manager.cc:218: received notification on actor, state: DEPENDENCIES_UNREADY, ip address: , port: 0, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=1542486ac0fc3f2be3665c5201000000 worker_id=NIL_ID node_id=NIL_ID
+[2025-08-28 14:59:53,069 I 100648 25100] actor_manager.cc:218: received notification on actor, state: DEPENDENCIES_UNREADY, ip address: , port: 0, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=1542486ac0fc3f2be3665c5201000000 worker_id=NIL_ID node_id=NIL_ID
+[2025-08-28 14:59:53,069 I 100648 25100] actor_manager.cc:218: received notification on actor, state: PENDING_CREATION, ip address: , port: 0, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=1542486ac0fc3f2be3665c5201000000 worker_id=NIL_ID node_id=NIL_ID
+[2025-08-28 14:59:53,179 I 100648 25100] actor_manager.cc:218: received notification on actor, state: ALIVE, ip address: 127.0.0.1, port: 62755, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=1542486ac0fc3f2be3665c5201000000 worker_id=daf86322e5dc9ac999cd65c7131e3e949441520ff5bf96f01bacecad node_id=5c0b3c063f200ec0e70e6c90ac54f017eaaa202329387a371b0d9053
+[2025-08-28 14:59:53,185 I 100648 25748] actor_task_submitter.cc:73: Set actor max pending calls to -1 actor_id=ff58d62d5147c11b4804eba201000000
+[2025-08-28 14:59:53,187 I 100648 25100] actor_manager.cc:218: received notification on actor, state: DEPENDENCIES_UNREADY, ip address: , port: 0, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=ff58d62d5147c11b4804eba201000000 worker_id=NIL_ID node_id=NIL_ID
+[2025-08-28 14:59:53,187 I 100648 25100] actor_manager.cc:218: received notification on actor, state: DEPENDENCIES_UNREADY, ip address: , port: 0, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=ff58d62d5147c11b4804eba201000000 worker_id=NIL_ID node_id=NIL_ID
+[2025-08-28 14:59:53,187 I 100648 25100] actor_manager.cc:218: received notification on actor, state: PENDING_CREATION, ip address: , port: 0, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=ff58d62d5147c11b4804eba201000000 worker_id=NIL_ID node_id=NIL_ID
+[2025-08-28 14:59:53,283 I 100648 25100] actor_manager.cc:218: received notification on actor, state: ALIVE, ip address: 127.0.0.1, port: 62762, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=ff58d62d5147c11b4804eba201000000 worker_id=4798530d568047008dc7e974482e197843c96636f7f3edbb7116f0fe node_id=5c0b3c063f200ec0e70e6c90ac54f017eaaa202329387a371b0d9053
+[2025-08-28 14:59:53,290 I 100648 25748] actor_task_submitter.cc:73: Set actor max pending calls to -1 actor_id=e775d1fe3fb09b839877430501000000
+[2025-08-28 14:59:53,291 I 100648 25100] actor_manager.cc:218: received notification on actor, state: DEPENDENCIES_UNREADY, ip address: , port: 0, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=e775d1fe3fb09b839877430501000000 worker_id=NIL_ID node_id=NIL_ID
+[2025-08-28 14:59:53,291 I 100648 25100] actor_manager.cc:218: received notification on actor, state: DEPENDENCIES_UNREADY, ip address: , port: 0, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=e775d1fe3fb09b839877430501000000 worker_id=NIL_ID node_id=NIL_ID
+[2025-08-28 14:59:53,292 I 100648 25100] actor_manager.cc:218: received notification on actor, state: PENDING_CREATION, ip address: , port: 0, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=e775d1fe3fb09b839877430501000000 worker_id=NIL_ID node_id=NIL_ID
+[2025-08-28 14:59:53,369 I 100648 25100] actor_manager.cc:218: received notification on actor, state: ALIVE, ip address: 127.0.0.1, port: 62769, num_restarts: 0, death context type=CONTEXT_NOT_SET actor_id=e775d1fe3fb09b839877430501000000 worker_id=910af1523c584730ae83b74890733a2939b208bba18ec9275663aff1 node_id=5c0b3c063f200ec0e70e6c90ac54f017eaaa202329387a371b0d9053
+[2025-08-28 14:59:53,422 I 100648 25748] core_worker.cc:1097: Sending disconnect message to the local raylet.
+[2025-08-28 14:59:53,423 I 100648 25748] raylet_client.cc:73: RayletClient::Disconnect, exit_type=INTENDED_USER_EXIT, exit_detail=Shutdown by ray.shutdown()., has creation_task_exception_pb_bytes=0
+[2025-08-28 14:59:53,424 I 100648 25748] core_worker.cc:1103: Disconnected from the local raylet.
+[2025-08-28 14:59:53,424 I 100648 25748] core_worker.cc:1019: Shutting down.
+[2025-08-28 14:59:53,424 I 100648 25748] task_event_buffer.cc:298: Shutting down TaskEventBuffer.
+[2025-08-28 14:59:53,424 I 100648 83320] task_event_buffer.cc:266: Task event buffer io service stopped.
+[2025-08-28 14:59:53,424 I 100648 25748] core_worker.cc:1037: Waiting for joining a core worker io thread. If it hangs here, there might be deadlock or a high load in the core worker io service.
+[2025-08-28 14:59:53,425 I 100648 25100] core_worker.cc:1290: Core worker main io service stopped.
+[2025-08-28 14:59:53,426 I 100648 25748] core_worker.cc:1049: Disconnecting a GCS client.
+[2025-08-28 14:59:53,426 I 100648 25748] core_worker.cc:1056: Core worker ready to be deallocated.
+[2025-08-28 14:59:53,426 I 100648 25748] core_worker.cc:1010: Core worker is destructed
+[2025-08-28 14:59:53,426 I 100648 25748] task_event_buffer.cc:298: Shutting down TaskEventBuffer.
+[2025-08-28 14:59:53,428 I 100648 25748] core_worker_process.cc:237: Destructing CoreWorkerProcessImpl. pid: 100648
+[2025-08-28 14:59:53,428 I 100648 25748] io_service_pool.cc:49: IOServicePool is stopped.
+[2025-08-28 14:59:53,669 I 100648 25748] stats.h:136: Stats module has shutdown.
+[2025-08-28 15:00:07,957 W 100648 25748] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 15:00:38,174 W 100648 25748] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 15:00:44,183 W 100648 25748] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 15:01:14,438 W 100648 25748] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 15:01:20,454 W 100648 25748] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 15:01:50,731 W 100648 25748] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 15:01:56,748 W 100648 25748] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.
+[2025-08-28 15:02:27,064 W 100648 25748] gcs_client.cc:183: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+[2025-08-28 15:02:33,073 W 100648 25748] gcs_rpc_client.h:151: Failed to connect to GCS at address 127.0.0.1:6379 within 5 seconds.

@@ -200,7 +200,12 @@ class FileTransferManager:
     
     async def initiate_file_transfer(self, file_path: str, recipients: List[str], 
                                    transfer_mode: str, sender_id: str) -> str:
-        """发起文件传输"""
+        """发起文件传输（异步版本）"""
+        return self.initiate_file_transfer_sync(file_path, recipients, transfer_mode, sender_id)
+    
+    def initiate_file_transfer_sync(self, file_path: str, recipients: List[str], 
+                                  transfer_mode: str, sender_id: str) -> str:
+        """发起文件传输（同步版本）"""
         try:
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"文件不存在: {file_path}")

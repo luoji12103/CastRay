@@ -238,7 +238,7 @@ class CastingNode:
                 return {"success": False, "error": "文件不存在"}
             
             # 创建传输会话
-            file_id = await self.file_transfer_manager.initiate_file_transfer(
+            file_id = self.file_transfer_manager.initiate_file_transfer_sync(
                 file_path, recipients, transfer_mode, self.node_id
             )
             
@@ -476,6 +476,24 @@ class CastingNode:
             })
         
         return sorted(all_messages, key=lambda x: x["timestamp"], reverse=True)[:count]
+    
+    async def get_file_transfer_stats(self):
+        """获取文件传输统计"""
+        return self.file_transfer_manager.get_statistics()
+    
+    async def get_active_transfers_count(self):
+        """获取活跃传输数量"""
+        return len(self.file_transfer_manager.get_all_transfers())
+    
+    async def enable_auto_transfer(self):
+        """启用自动传输"""
+        self.auto_transfer_enabled = True
+        logger.info(f"节点 {self.node_id} 自动传输已启用")
+    
+    async def disable_auto_transfer(self):
+        """禁用自动传输"""
+        self.auto_transfer_enabled = False
+        logger.info(f"节点 {self.node_id} 自动传输已禁用")
 
 
 class CastingCluster:

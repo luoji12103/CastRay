@@ -1,0 +1,20 @@
+2025-08-28 14:55:28,942	INFO log_monitor.py:157 -- Starting log monitor with [max open files=200], [is_autoscaler_v2=False]
+2025-08-28 14:55:28,944	INFO log_monitor.py:279 -- Beginning to track file raylet.err
+2025-08-28 14:55:28,944	INFO log_monitor.py:279 -- Beginning to track file monitor.log
+2025-08-28 14:55:28,944	INFO log_monitor.py:279 -- Beginning to track file gcs_server.err
+2025-08-28 14:55:29,047	INFO log_monitor.py:279 -- Beginning to track file worker-42d62b97dcf2d2d582c24a01c6a41006535ce7a02988a102e647d62e-ffffffff-71504.err
+2025-08-28 14:55:29,048	INFO log_monitor.py:279 -- Beginning to track file worker-42d62b97dcf2d2d582c24a01c6a41006535ce7a02988a102e647d62e-ffffffff-71504.out
+2025-08-28 14:55:29,148	INFO log_monitor.py:279 -- Beginning to track file worker-0d7c79eddcd3507b733d9f72ef8f83d025d4fcfcd3776398cc88f60e-ffffffff-95744.err
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-0d7c79eddcd3507b733d9f72ef8f83d025d4fcfcd3776398cc88f60e-ffffffff-95744.out
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-14a07ddf1e4b5e7de38d4b8f5ddf8fd49c4128615c21f9afde5d091e-ffffffff-88156.err
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-14a07ddf1e4b5e7de38d4b8f5ddf8fd49c4128615c21f9afde5d091e-ffffffff-88156.out
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-66cca398b3b5f1c53243caa2ae458bbbe20035e4665a0ba9e34e11e5-ffffffff-90568.err
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-66cca398b3b5f1c53243caa2ae458bbbe20035e4665a0ba9e34e11e5-ffffffff-90568.out
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-8fde45d4961553bf1da5859d82f65e14cfe649d047e3a8b3de08e70d-ffffffff-131788.err
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-8fde45d4961553bf1da5859d82f65e14cfe649d047e3a8b3de08e70d-ffffffff-131788.out
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-af10a8d5fc67be085d4af1d4ad10e1d942af9b3c5e195d9d88efc34f-ffffffff-82788.err
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-af10a8d5fc67be085d4af1d4ad10e1d942af9b3c5e195d9d88efc34f-ffffffff-82788.out
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-ba59691e1d8d33cface37c5e64488efc1a3f0f421b38a0194b43c22b-ffffffff-87256.err
+2025-08-28 14:55:29,150	INFO log_monitor.py:279 -- Beginning to track file worker-ba59691e1d8d33cface37c5e64488efc1a3f0f421b38a0194b43c22b-ffffffff-87256.out
+2025-08-28 14:55:29,252	INFO log_monitor.py:279 -- Beginning to track file worker-5356359fa366a53075612c13b032772b1b775dccfd9f8964864a8a1f-ffffffff-10460.err
+2025-08-28 14:55:29,252	INFO log_monitor.py:279 -- Beginning to track file worker-5356359fa366a53075612c13b032772b1b775dccfd9f8964864a8a1f-ffffffff-10460.out
