@@ -383,3 +383,73 @@ Other Stats:
 	num profile task events dropped: 0
 
 
+[2025-08-28 15:07:21,608 I 132764 125736] core_worker.cc:915: Event stats:
+
+
+Global stats: 5085 total (8 active)
+Queueing time: mean = 6.525 ms, max = 15.953 ms, min = -0.000 s, total = 33.178 s
+Execution time:  mean = 116.082 us, total = 590.279 ms
+Event stats:
+	CoreWorker.RecoverObjects - 3337 total (1 active), Execution time: mean = 6.835 us, total = 22.808 ms, Queueing time: mean = 7.908 ms, max = 11.928 ms, min = 3.020 ms, total = 26.389 s
+	NodeManagerService.grpc_client.ReportWorkerBacklog - 358 total (0 active), Execution time: mean = 741.209 us, total = 265.353 ms, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	NodeManagerService.grpc_client.ReportWorkerBacklog.OnReplyReceived - 358 total (0 active), Execution time: mean = 14.608 us, total = 5.230 ms, Queueing time: mean = 20.186 us, max = 1.138 ms, min = 4.300 us, total = 7.227 ms
+	CoreWorker.ExitIfParentRayletDies - 358 total (1 active), Execution time: mean = 14.561 us, total = 5.213 ms, Queueing time: mean = 8.183 ms, max = 15.953 ms, min = -0.000 s, total = 2.930 s
+	CoreWorker.InternalHeartbeat - 358 total (1 active), Execution time: mean = 284.906 us, total = 101.996 ms, Queueing time: mean = 8.055 ms, max = 15.871 ms, min = -0.000 s, total = 2.884 s
+	CoreWorkerService.grpc_server.PushTask.HandleRequestImpl - 93 total (0 active), Execution time: mean = 17.634 us, total = 1.640 ms, Queueing time: mean = 10.310 us, max = 15.000 us, min = 6.100 us, total = 958.800 us
+	CoreWorkerService.grpc_server.PushTask - 93 total (0 active), Execution time: mean = 1.913 ms, total = 177.948 ms, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	CoreWorker.RecordMetrics - 72 total (1 active), Execution time: mean = 64.475 us, total = 4.642 ms, Queueing time: mean = 8.377 ms, max = 15.307 ms, min = 188.900 us, total = 603.133 ms
+	CoreWorker.TryDelPendingObjectRefStreams - 36 total (1 active), Execution time: mean = 4.553 us, total = 163.900 us, Queueing time: mean = 8.288 ms, max = 14.568 ms, min = 646.400 us, total = 298.356 ms
+	PeriodicalRunner.RunFnPeriodically - 7 total (0 active), Execution time: mean = 231.214 us, total = 1.619 ms, Queueing time: mean = 424.686 us, max = 1.266 ms, min = 7.400 us, total = 2.973 ms
+	CoreWorker.PrintEventStats - 6 total (1 active, 1 running), Execution time: mean = 308.883 us, total = 1.853 ms, Queueing time: mean = 8.820 ms, max = 13.486 ms, min = 2.802 ms, total = 52.921 ms
+	Publisher.CheckDeadSubscribers - 2 total (1 active), Execution time: mean = 4.650 us, total = 9.300 us, Queueing time: mean = 4.700 ms, max = 9.401 ms, min = 9.401 ms, total = 9.401 ms
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberCommandBatch.OnReplyReceived - 1 total (0 active), Execution time: mean = 202.900 us, total = 202.900 us, Queueing time: mean = 7.800 us, max = 7.800 us, min = 7.800 us, total = 7.800 us
+	ray::rpc::WorkerInfoGcsService.grpc_client.AddWorkerInfo - 1 total (0 active), Execution time: mean = 600.200 us, total = 600.200 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberCommandBatch - 1 total (0 active), Execution time: mean = 539.800 us, total = 539.800 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::NodeInfoGcsService.grpc_client.GetAllNodeInfo - 1 total (0 active), Execution time: mean = 361.900 us, total = 361.900 us, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::NodeInfoGcsService.grpc_client.GetAllNodeInfo.OnReplyReceived - 1 total (0 active), Execution time: mean = 71.500 us, total = 71.500 us, Queueing time: mean = 9.200 us, max = 9.200 us, min = 9.200 us, total = 9.200 us
+	ray::rpc::InternalPubSubGcsService.grpc_client.GcsSubscriberPoll - 1 total (1 active), Execution time: mean = 0.000 s, total = 0.000 s, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::WorkerInfoGcsService.grpc_client.AddWorkerInfo.OnReplyReceived - 1 total (0 active), Execution time: mean = 28.100 us, total = 28.100 us, Queueing time: mean = 11.000 us, max = 11.000 us, min = 11.000 us, total = 11.000 us
+
+-----------------
+Task execution event stats:
+
+Global stats: 23437 total (1 active)
+Queueing time: mean = 5.394 ms, max = 94.218 ms, min = 2.000 us, total = 126.422 s
+Execution time:  mean = 16.132 us, total = 378.085 ms
+Event stats:
+	CoreWorker.CheckSignal - 23343 total (1 active), Execution time: mean = 12.139 us, total = 283.365 ms, Queueing time: mean = 5.416 ms, max = 94.218 ms, min = 874.200 us, total = 126.421 s
+	CoreWorker.HandlePushTaskActor - 92 total (0 active), Execution time: mean = 45.100 us, total = 4.149 ms, Queueing time: mean = 11.786 us, max = 230.300 us, min = 5.300 us, total = 1.084 ms
+	PeriodicalRunner.RunFnPeriodically - 1 total (0 active), Execution time: mean = 12.600 us, total = 12.600 us, Queueing time: mean = 2.000 us, max = 2.000 us, min = 2.000 us, total = 2.000 us
+	CoreWorker.HandlePushTask - 1 total (0 active), Execution time: mean = 90.558 ms, total = 90.558 ms, Queueing time: mean = 7.700 us, max = 7.700 us, min = 7.700 us, total = 7.700 us
+
+-----------------
+Task Event stats:
+
+IO Service Stats:
+
+Global stats: 1075 total (1 active)
+Queueing time: mean = 2.693 ms, max = 16.188 ms, min = -0.000 s, total = 2.895 s
+Execution time:  mean = 303.525 us, total = 326.289 ms
+Event stats:
+	ray::rpc::TaskInfoGcsService.grpc_client.AddTaskEventData - 358 total (0 active), Execution time: mean = 586.227 us, total = 209.869 ms, Queueing time: mean = 0.000 s, max = -0.000 s, min = 9223372036.855 s, total = 0.000 s
+	ray::rpc::TaskInfoGcsService.grpc_client.AddTaskEventData.OnReplyReceived - 358 total (0 active), Execution time: mean = 18.936 us, total = 6.779 ms, Queueing time: mean = 31.559 us, max = 591.100 us, min = 3.900 us, total = 11.298 ms
+	CoreWorker.deadline_timer.flush_task_events - 358 total (1 active), Execution time: mean = 305.752 us, total = 109.459 ms, Queueing time: mean = 8.054 ms, max = 16.188 ms, min = -0.000 s, total = 2.883 s
+	PeriodicalRunner.RunFnPeriodically - 1 total (0 active), Execution time: mean = 181.900 us, total = 181.900 us, Queueing time: mean = 8.500 us, max = 8.500 us, min = 8.500 us, total = 8.500 us
+Other Stats:
+	grpc_in_progress:0
+	current number of task status events in buffer: 0
+	current number of profile events in buffer: 0
+	current number of dropped task attempts tracked: 0
+	total task events sent: 0.0357018 MiB
+	total number of task attempts sent: 95
+	total number of task attempts dropped reported: 0
+	total number of sent failure: 0
+	num status task events dropped: 0
+	num profile task events dropped: 0
+
+
+[2025-08-28 15:07:26,891 I 132764 125736] core_worker.cc:4583: Force kill actor request has received. exiting immediately... The actor is dead because its owner has died. Owner Id: 01000000ffffffffffffffffffffffffffffffffffffffffffffffff Owner Ip address: 127.0.0.1 Owner worker exit type: INTENDED_USER_EXIT Worker exit detail: Owner's worker process has crashed.
+[2025-08-28 15:07:26,891 W 132764 125736] core_worker.cc:1263: Force exit the process.  Details: Worker exits because the actor is killed. The actor is dead because its owner has died. Owner Id: 01000000ffffffffffffffffffffffffffffffffffffffffffffffff Owner Ip address: 127.0.0.1 Owner worker exit type: INTENDED_USER_EXIT Worker exit detail: Owner's worker process has crashed.
+[2025-08-28 15:07:26,917 I 132764 125736] core_worker.cc:1097: Sending disconnect message to the local raylet.
+[2025-08-28 15:07:26,917 I 132764 125736] raylet_client.cc:73: RayletClient::Disconnect, exit_type=INTENDED_SYSTEM_EXIT, exit_detail=Worker exits because the actor is killed. The actor is dead because its owner has died. Owner Id: 01000000ffffffffffffffffffffffffffffffffffffffffffffffff Owner Ip address: 127.0.0.1 Owner worker exit type: INTENDED_USER_EXIT Worker exit detail: Owner's worker process has crashed., has creation_task_exception_pb_bytes=0
+[2025-08-28 15:07:26,920 I 132764 125736] core_worker.cc:1103: Disconnected from the local raylet.

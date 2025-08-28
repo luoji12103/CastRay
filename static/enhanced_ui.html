@@ -262,6 +262,80 @@
             background: linear-gradient(45deg, #ff9800, #f57c00);
         }
 
+        /* 复选框组样式 */
+        .checkbox-group {
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 15px;
+            background: rgba(248, 249, 250, 0.9);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+
+        .checkbox-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .checkbox-item.disabled:hover {
+            background: white;
+            transform: none;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-label {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .node-info {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .node-status {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-online {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-offline {
+            background: #f44336;
+            color: white;
+        }
+
         .transfer-log { 
             max-height: 400px; 
             overflow-y: auto; 
@@ -466,9 +540,18 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>接收节点 (按住Ctrl选择多个)</label>
-                <select id="recipients" multiple class="form-control" style="min-height: 100px;">
-                </select>
+                <label>
+                    接收节点 (可选择多个)
+                    <div style="float: right;">
+                        <button type="button" class="btn" style="padding: 4px 8px; font-size: 12px; margin-left: 5px;" onclick="selectAllRecipients()">全选</button>
+                        <button type="button" class="btn" style="padding: 4px 8px; font-size: 12px; margin-left: 5px;" onclick="clearAllRecipients()">清空</button>
+                    </div>
+                </label>
+                <div id="recipientCheckboxes" class="checkbox-group">
+                    <div style="text-align: center; color: #666; padding: 20px;">
+                        正在加载节点列表...
+                    </div>
+                </div>
             </div>
             <div style="text-align: center; margin-top: 20px;">
                 <button class="btn" onclick="triggerManualTransfer()">
@@ -711,14 +794,130 @@
         // 更新节点选择下拉框
         function updateNodeSelects(nodes) {
             const senderSelect = document.getElementById('senderNode');
-            const recipientsSelect = document.getElementById('recipients');
+            const checkboxContainer = document.getElementById('recipientCheckboxes');
             
-            const options = nodes.map(node => 
+            // 记住当前选择状态
+            const currentSender = senderSelect.value;
+            const currentRecipients = getSelectedRecipients();
+            
+            // 更新发送节点下拉框
+            const senderOptions = nodes.map(node => 
                 `<option value="${node.node_id}">${node.node_id} (${node.is_running ? '在线' : '离线'})</option>`
             ).join('');
             
-            senderSelect.innerHTML = '<option value="">选择发送节点</option>' + options;
-            recipientsSelect.innerHTML = options;
+            senderSelect.innerHTML = '<option value="">选择发送节点</option>' + senderOptions;
+            
+            // 恢复发送节点选择
+            if (currentSender && nodes.find(n => n.node_id === currentSender)) {
+                senderSelect.value = currentSender;
+            }
+            
+            // 更新接收节点复选框
+            if (nodes.length === 0) {
+                checkboxContainer.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 20px;">
+                        暂无可用节点
+                    </div>
+                `;
+                return;
+            }
+            
+            checkboxContainer.innerHTML = nodes.map(node => {
+                const isOnline = node.is_running;
+                const isCurrentSender = node.node_id === senderSelect.value;
+                const isChecked = currentRecipients.includes(node.node_id) && !isCurrentSender;
+                
+                return `
+                    <div class="checkbox-item ${!isOnline ? 'disabled' : ''}" 
+                         onclick="toggleRecipient('${node.node_id}', this)">
+                        <input type="checkbox" 
+                               id="recipient_${node.node_id}" 
+                               value="${node.node_id}"
+                               ${isChecked ? 'checked' : ''}
+                               ${!isOnline ? 'disabled data-originally-disabled="true"' : ''}
+                               onchange="updateRecipientSelection()">
+                        <label for="recipient_${node.node_id}" class="checkbox-label">
+                            <span class="node-info">🖥️ ${node.node_id}</span>
+                            <span class="node-status ${isOnline ? 'status-online' : 'status-offline'}">
+                                ${isOnline ? 'ONLINE' : 'OFFLINE'}
+                            </span>
+                        </label>
+                    </div>
+                `;
+            }).join('');
+            
+            // 为发送节点选择添加事件监听器，当发送节点改变时更新接收节点复选框
+            senderSelect.onchange = function() {
+                updateRecipientCheckboxes();
+            };
+        }
+
+        // 获取当前选择的接收节点
+        function getSelectedRecipients() {
+            const checkboxes = document.querySelectorAll('#recipientCheckboxes input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        // 切换接收节点选择
+        function toggleRecipient(nodeId, element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            const senderNodeId = document.getElementById('senderNode').value;
+            
+            // 如果是禁用状态或者是当前选择的发送节点，不允许选择
+            if (checkbox.disabled || nodeId === senderNodeId) {
+                return;
+            }
+            
+            checkbox.checked = !checkbox.checked;
+            updateRecipientSelection();
+        }
+
+        // 更新接收节点选择状态
+        function updateRecipientSelection() {
+            const senderNodeId = document.getElementById('senderNode').value;
+            const checkboxes = document.querySelectorAll('#recipientCheckboxes input[type="checkbox"]');
+            
+            checkboxes.forEach(checkbox => {
+                const item = checkbox.closest('.checkbox-item');
+                
+                // 如果是发送节点，禁用并取消选择
+                if (checkbox.value === senderNodeId) {
+                    checkbox.checked = false;
+                    checkbox.disabled = true;
+                    item.classList.add('disabled');
+                    item.style.opacity = '0.5';
+                } else if (!checkbox.hasAttribute('data-originally-disabled')) {
+                    // 如果不是原本就禁用的节点，恢复启用状态
+                    checkbox.disabled = false;
+                    item.classList.remove('disabled');
+                    item.style.opacity = '1';
+                }
+            });
+        }
+
+        // 更新接收节点复选框状态
+        function updateRecipientCheckboxes() {
+            updateRecipientSelection();
+        }
+
+        // 全选接收节点
+        function selectAllRecipients() {
+            const senderNodeId = document.getElementById('senderNode').value;
+            const checkboxes = document.querySelectorAll('#recipientCheckboxes input[type="checkbox"]');
+            
+            checkboxes.forEach(checkbox => {
+                if (!checkbox.disabled && checkbox.value !== senderNodeId) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+
+        // 清空所有接收节点选择
+        function clearAllRecipients() {
+            const checkboxes = document.querySelectorAll('#recipientCheckboxes input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
         }
 
         // 更新Ray集群信息
@@ -844,8 +1043,7 @@
         async function triggerManualTransfer() {
             const sender = document.getElementById('senderNode').value;
             const fileName = document.getElementById('demoFile').value;
-            const recipientSelect = document.getElementById('recipients');
-            const recipients = Array.from(recipientSelect.selectedOptions).map(opt => opt.value);
+            const recipients = getSelectedRecipients();
             
             if (!sender) {
                 alert('请选择发送节点');
@@ -854,6 +1052,12 @@
             
             if (recipients.length === 0) {
                 alert('请选择至少一个接收节点');
+                return;
+            }
+            
+            // 检查是否尝试发送给自己
+            if (recipients.includes(sender)) {
+                alert('发送节点不能同时作为接收节点');
                 return;
             }
             
