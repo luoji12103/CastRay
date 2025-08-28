@@ -50,8 +50,11 @@ def load_config():
     logger.info("使用默认配置")
     return {
         "ray_cluster": {
-            "address": os.environ.get("RAY_ADDRESS", "auto"),
-            "namespace": "castray"
+            "address": "local",  # 改为local以启动本地集群
+            "namespace": "castray",
+            "create_demo_nodes": True,
+            "max_retries": 3,
+            "retry_delay": 2
         },
         "web_server": {
             "host": "0.0.0.0", 
@@ -59,7 +62,9 @@ def load_config():
             "log_level": "info"
         },
         "file_transfer": {
-            "download_dir": os.environ.get("CASTRAY_DOWNLOAD_DIR", "downloads")
+            "download_dir": os.environ.get("CASTRAY_DOWNLOAD_DIR", "downloads"),
+            "chunk_size": 8192,
+            "max_file_size": 100*1024*1024
         }
     }
 
@@ -105,25 +110,60 @@ async def startup_event():
     
     # 从配置获取Ray集群设置
     ray_config = config.get("ray_cluster", {})
-    ray_address = ray_config.get("address", "auto")
+    ray_address = ray_config.get("address", "local")
     namespace = ray_config.get("namespace", "castray")
+    max_retries = ray_config.get("max_retries", 3)
+    retry_delay = ray_config.get("retry_delay", 2)
     
-    # 初始化Ray集群连接
-    success = await cluster.initialize_ray(ray_address, namespace)
+    # 尝试初始化Ray集群连接（带重试机制）
+    success = False
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"第 {attempt + 1}/{max_retries} 次尝试初始化Ray集群...")
+            success = await cluster.initialize_ray(ray_address, namespace)
+            if success:
+                break
+            else:
+                logger.warning(f"第 {attempt + 1} 次尝试失败")
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(retry_delay)
+        except Exception as e:
+            logger.error(f"第 {attempt + 1} 次尝试时发生异常: {e}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(retry_delay)
+    
     if not success:
-        logger.error("Ray集群初始化失败，系统可能无法正常工作")
-        return
-    
-    # 根据配置决定是否创建示例节点
-    create_demo_nodes = ray_config.get("create_demo_nodes", True)
-    if create_demo_nodes:
-        # 创建一些示例节点
-        for i in range(3):
-            node_id = f"node_{i+1}"
-            await cluster.create_node(node_id)
+        logger.error("Ray集群初始化完全失败，系统将以降级模式运行")
+        logger.warning("部分功能可能不可用，但基本Web界面仍可访问")
+    else:
+        logger.info("Ray集群初始化成功")
         
-        # 启动演示传输调度器
-        asyncio.create_task(scheduler.start_demo_transfers())
+        # 根据配置决定是否创建示例节点
+        create_demo_nodes = ray_config.get("create_demo_nodes", True)
+        if create_demo_nodes:
+            logger.info("正在创建演示节点...")
+            try:
+                # 创建一些示例节点
+                demo_node_count = 3
+                created_nodes = 0
+                for i in range(demo_node_count):
+                    node_id = f"node_{i+1}"
+                    node_success = await cluster.create_node(node_id)
+                    if node_success:
+                        created_nodes += 1
+                        logger.info(f"成功创建节点: {node_id}")
+                    else:
+                        logger.warning(f"创建节点失败: {node_id}")
+                
+                logger.info(f"成功创建 {created_nodes}/{demo_node_count} 个演示节点")
+                
+                # 启动演示传输调度器（如果有节点成功创建）
+                if created_nodes > 0:
+                    asyncio.create_task(scheduler.start_demo_transfers())
+                    logger.info("演示传输调度器已启动")
+                
+            except Exception as e:
+                logger.error(f"创建演示节点时发生错误: {e}")
     
     logger.info("系统启动完成")
 
@@ -137,384 +177,30 @@ async def shutdown_event():
 
 @app.get("/", response_class=HTMLResponse)
 async def get_homepage():
-    """主页"""
-    html_content = '''
+    """主页 - 重定向到增强UI"""
+    return '''
     <!DOCTYPE html>
-    <html lang="zh-CN">
+    <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>分布式消息传输系统</title>
-        <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: Arial, sans-serif; background: #f5f5f5; }
-            .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-            .header { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-            .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-            .button { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
-            .button:hover { background: #2980b9; }
-            .button.success { background: #27ae60; }
-            .button.danger { background: #e74c3c; }
-            .form-group { margin-bottom: 15px; }
-            .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-            .form-group input, .form-group select, .form-group textarea { 
-                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; 
-            }
-            .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-            .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-            .status-item { background: #ecf0f1; padding: 15px; border-radius: 4px; text-align: center; }
-            .status-value { font-size: 24px; font-weight: bold; color: #2c3e50; }
-            .status-label { color: #7f8c8d; margin-top: 5px; }
-            .message-log { max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; }
-            .message-item { padding: 8px; margin-bottom: 5px; border-left: 4px solid #3498db; background: white; }
-            .message-sent { border-left-color: #27ae60; }
-            .message-received { border-left-color: #e74c3c; }
-            .node-status { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
-            .node-online { background: #27ae60; }
-            .node-offline { background: #e74c3c; }
-            #connectionStatus { padding: 10px; border-radius: 4px; margin-bottom: 20px; }
-            .connected { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-            .disconnected { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        </style>
+        <meta http-equiv="refresh" content="0; url=/ui">
+        <title>CastRay - 重定向中...</title>
     </head>
     <body>
-        <div class="container">
-            <div class="header">
-                <h1>🚀 分布式消息与文件传输系统</h1>
-                <p>基于Ray集群的自动化传输监控平台 - 节点自主发起传输</p>
-            </div>
-
-            <div id="connectionStatus" class="disconnected">
-                ⚠️ 正在连接到服务器...
-            </div>
-
-            <div class="grid">
-                <!-- 系统状态 -->
-                <div class="card">
-                    <h3>📊 系统状态</h3>
-                    <div class="status-grid" id="systemStatus">
-                        <div class="status-item">
-                            <div class="status-value" id="totalNodes">-</div>
-                            <div class="status-label">总节点数</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="activeNodes">-</div>
-                            <div class="status-label">活跃节点</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="totalTransfers">-</div>
-                            <div class="status-label">文件传输</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="rayNodes">-</div>
-                            <div class="status-label">Ray节点</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 传输监控 -->
-                <div class="card">
-                    <h3>� 文件传输监控</h3>
-                    <div class="status-grid" id="transferStats">
-                        <div class="status-item">
-                            <div class="status-value" id="successfulTransfers">-</div>
-                            <div class="status-label">成功传输</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="failedTransfers">-</div>
-                            <div class="status-label">失败传输</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="bytesTransferred">-</div>
-                            <div class="status-label">传输字节</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="activeTransfers">-</div>
-                            <div class="status-label">进行中</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 手动操作面板 -->
-            <div class="card">
-                <h3>🎮 手动操作 (管理员)</h3>
-                <div class="grid">
-                    <div>
-                        <div class="form-group">
-                            <label>发送节点:</label>
-                            <select id="senderNode">
-                                <option value="">选择发送节点</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>演示文件:</label>
-                            <select id="demoFile">
-                                <option value="config.json">config.json</option>
-                                <option value="data.txt">data.txt</option>
-                                <option value="report.md">report.md</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="form-group">
-                            <label>接收节点:</label>
-                            <select id="recipients" multiple>
-                            </select>
-                            <small>按住Ctrl选择多个节点</small>
-                        </div>
-                        <button class="button" onclick="triggerManualTransfer()">手动触发文件传输</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid">
-                <!-- 节点列表和状态 -->
-                <div class="card">
-                    <h3>🖥️ 节点状态监控</h3>
-                    <div id="nodesList"></div>
-                </div>
-
-                <!-- 传输活动日志 -->
-                <div class="card">
-                    <h3>� 传输活动日志</h3>
-                    <div class="message-log" id="transferLog">
-                        <div style="text-align: center; color: #7f8c8d; padding: 20px;">
-                            监控节点自主发起的文件传输活动...
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 演示文件列表 -->
-            <div class="card">
-                <h3>📁 可用演示文件</h3>
-                <div class="grid">
-                    <div class="status-item">
-                        <div class="status-label">config.json</div>
-                        <small>配置文件 (JSON格式)</small>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">data.txt</div>
-                        <small>文本数据文件</small>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">report.md</div>
-                        <small>Markdown报告文件</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <script>
-            let ws = null;
-            let totalTransfers = 0;
-            let transferLog = [];
-
-            function connectWebSocket() {
-                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const wsUrl = `${protocol}//${window.location.host}/ws`;
-                
-                ws = new WebSocket(wsUrl);
-                
-                ws.onopen = function() {
-                    document.getElementById('connectionStatus').innerHTML = '✅ 已连接到服务器';
-                    document.getElementById('connectionStatus').className = 'connected';
-                    loadStatus();
-                };
-                
-                ws.onmessage = function(event) {
-                    const data = JSON.parse(event.data);
-                    if (data.type === 'status_update') {
-                        updateStatus(data.data);
-                    } else if (data.type === 'transfer_activity') {
-                        updateTransferLog(data.data);
-                    }
-                };
-                
-                ws.onclose = function() {
-                    document.getElementById('connectionStatus').innerHTML = '❌ 连接已断开，正在重连...';
-                    document.getElementById('connectionStatus').className = 'disconnected';
-                    setTimeout(connectWebSocket, 3000);
-                };
-                
-                ws.onerror = function(error) {
-                    console.error('WebSocket错误:', error);
-                };
-            }
-
-            async function loadStatus() {
-                try {
-                    const response = await fetch('/api/status');
-                    const data = await response.json();
-                    updateStatus(data);
-                    
-                    // 加载文件传输状态
-                    const transferResponse = await fetch('/api/file-transfers/status');
-                    const transferData = await transferResponse.json();
-                    updateTransferStats(transferData);
-                } catch (error) {
-                    console.error('加载状态失败:', error);
-                }
-            }
-
-            function updateStatus(data) {
-                document.getElementById('totalNodes').textContent = data.total_nodes || 0;
-                document.getElementById('activeNodes').textContent = data.active_nodes || 0;
-                document.getElementById('rayNodes').textContent = 
-                    data.ray_cluster?.nodes || data.ray_cluster?.error || 'N/A';
-                
-                updateNodesList(data.node_statuses || []);
-                updateNodeSelects(data.node_statuses || []);
-            }
-
-            function updateTransferStats(data) {
-                let totalSuccessful = 0;
-                let totalFailed = 0;
-                let totalBytes = 0;
-                let totalActive = 0;
-                
-                Object.values(data).forEach(nodeData => {
-                    if (nodeData.file_transfer_stats) {
-                        const stats = nodeData.file_transfer_stats;
-                        totalSuccessful += stats.successful_transfers || 0;
-                        totalFailed += stats.failed_transfers || 0;
-                        totalBytes += stats.bytes_transferred || 0;
-                    }
-                    totalActive += nodeData.active_transfers || 0;
-                });
-                
-                document.getElementById('successfulTransfers').textContent = totalSuccessful;
-                document.getElementById('failedTransfers').textContent = totalFailed;
-                document.getElementById('bytesTransferred').textContent = formatBytes(totalBytes);
-                document.getElementById('activeTransfers').textContent = totalActive;
-                document.getElementById('totalTransfers').textContent = totalSuccessful + totalFailed;
-            }
-
-            function updateNodesList(nodes) {
-                const nodesList = document.getElementById('nodesList');
-                nodesList.innerHTML = nodes.map(node => {
-                    const autoTransfers = node.auto_transfer_queue || 0;
-                    const fileStats = node.file_transfer_stats || {};
-                    
-                    return `
-                        <div style="padding: 10px; border-bottom: 1px solid #eee;">
-                            <span class="node-status ${node.is_running ? 'node-online' : 'node-offline'}"></span>
-                            <strong>${node.node_id}</strong> 
-                            (端口: ${node.port || 'N/A'})
-                            <br>
-                            <small>
-                                消息: 收${node.received_count || 0}/发${node.sent_count || 0} | 
-                                文件传输: 成功${fileStats.successful_transfers || 0}/失败${fileStats.failed_transfers || 0} |
-                                队列: ${autoTransfers}
-                            </small>
-                            ${node.auto_transfer_enabled ? 
-                                '<span style="color: green;">●</span> 自动传输已启用' : 
-                                '<span style="color: red;">●</span> 自动传输已禁用'
-                            }
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            function updateNodeSelects(nodes) {
-                const senderSelect = document.getElementById('senderNode');
-                const recipientsSelect = document.getElementById('recipients');
-                
-                const options = nodes.map(node => 
-                    `<option value="${node.node_id}">${node.node_id}</option>`
-                ).join('');
-                
-                senderSelect.innerHTML = '<option value="">选择发送节点</option>' + options;
-                recipientsSelect.innerHTML = options;
-            }
-
-            function updateTransferLog(activity) {
-                transferLog.unshift({
-                    ...activity,
-                    timestamp: new Date().toLocaleString()
-                });
-                
-                // 保持最新50条记录
-                if (transferLog.length > 50) {
-                    transferLog = transferLog.slice(0, 50);
-                }
-                
-                const logContainer = document.getElementById('transferLog');
-                logContainer.innerHTML = transferLog.map(log => `
-                    <div class="message-item" style="border-left-color: ${getActivityColor(log.type)};">
-                        <strong>[${log.type}]</strong> ${log.node_id || 'System'}<br>
-                        <small>${log.timestamp}</small><br>
-                        ${log.description || JSON.stringify(log)}
-                    </div>
-                `).join('');
-            }
-
-            function getActivityColor(activityType) {
-                const colors = {
-                    'transfer_start': '#3498db',
-                    'transfer_complete': '#27ae60',
-                    'transfer_error': '#e74c3c',
-                    'file_received': '#9b59b6',
-                    'auto_transfer': '#f39c12'
-                };
-                return colors[activityType] || '#7f8c8d';
-            }
-
-            async function triggerManualTransfer() {
-                const sender = document.getElementById('senderNode').value;
-                const fileName = document.getElementById('demoFile').value;
-                const recipientSelect = document.getElementById('recipients');
-                const recipients = Array.from(recipientSelect.selectedOptions).map(opt => opt.value);
-                
-                if (!sender || recipients.length === 0) {
-                    alert('请选择发送节点和接收节点');
-                    return;
-                }
-                
-                try {
-                    const response = await fetch('/api/file-transfers/manual', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            sender_id: sender,
-                            file_name: fileName,
-                            recipients: recipients
-                        })
-                    });
-                    
-                    const result = await response.json();
-                    if (result.success) {
-                        alert(`手动传输已触发\\n接收者: ${recipients.join(', ')}\\n文件: ${fileName}`);
-                        loadStatus();
-                    } else {
-                        alert('手动传输失败: ' + result.message);
-                    }
-                } catch (error) {
-                    alert('触发手动传输时发生错误: ' + error.message);
-                }
-            }
-
-            function formatBytes(bytes) {
-                if (bytes === 0) return '0 B';
-                const k = 1024;
-                const sizes = ['B', 'KB', 'MB', 'GB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-
-            // 页面加载时连接WebSocket
-            window.onload = function() {
-                connectWebSocket();
-            };
-
-            // 定期更新状态
-            setInterval(loadStatus, 5000);
-        </script>
+        <p>正在重定向到增强界面... <a href="/ui">点击这里</a></p>
     </body>
     </html>
     '''
-    return HTMLResponse(content=html_content)
+
+@app.get("/ui", response_class=HTMLResponse)
+async def get_enhanced_ui():
+    """增强的用户界面"""
+    ui_file = static_dir / "enhanced_ui.html"
+    if ui_file.exists():
+        with open(ui_file, 'r', encoding='utf-8') as f:
+            return HTMLResponse(content=f.read())
+    else:
+        return HTMLResponse(content="<h1>UI文件未找到</h1>", status_code=404)
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

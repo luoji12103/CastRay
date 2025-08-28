@@ -1,0 +1,84 @@
+Windows fatal exception: access violation
+
+Windows fatal exception: access violation
+
+[2025-08-28 14:34:50,500 E 100956 53892] (raylet.exe) agent_manager.cc:86: The raylet exited immediately because one Ray agent failed, agent_name = runtime_env_agent.
+The raylet fate shares with the agent. This can happen because
+- The version of `grpcio` doesn't follow Ray's requirement. Agent can segfault with the incorrect `grpcio` version. Check the grpcio version `pip freeze | grep grpcio`.
+- The agent failed to start because of unexpected error or port conflict. Read the log `cat /tmp/ray/session_latest/logs/{dashboard_agent|runtime_env_agent}.log`. You can find the log file structure here https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#logging-directory-structure.
+- The agent is killed by the OS (e.g., out of memory).
+*** SIGSEGV received at time=1756362890 ***
+    @   00007FF799140689  (unknown)  (unknown)
+    @   00007FFB976BF47F  (unknown)  (unknown)
+    @   00007FFBB90C6FEF  (unknown)  (unknown)
+    @   00007FFBB8FD4557  (unknown)  (unknown)
+    @   00007FFBB90C692E  (unknown)  (unknown)
+    @   00007FF7989E42AA  (unknown)  (unknown)
+    @   00007FF798AAEF34  (unknown)  (unknown)
+    @   00007FF798AADA0F  (unknown)  (unknown)
+    @   00007FF798AB0D9D  (unknown)  (unknown)
+    @   00007FF7989E5E42  (unknown)  (unknown)
+    @   00007FF7989E0D50  (unknown)  (unknown)
+    @   00007FF79895AC74  (unknown)  (unknown)
+    @   00007FF7988097B1  (unknown)  (unknown)
+    @   00007FF798783149  (unknown)  (unknown)
+    @   00007FF798B4D109  (unknown)  (unknown)
+    @   00007FF798B45A6E  (unknown)  (unknown)
+    @   00007FF798B45FF8  (unknown)  (unknown)
+    @   00007FF7990B0B9C  (unknown)  (unknown)
+    @   00007FF7990B5E34  (unknown)  (unknown)
+    @   00007FF7990B5193  (unknown)  (unknown)
+    @   00007FF7987902E1  (unknown)  (unknown)
+    @   00007FF7990F9A48  (unknown)  (unknown)
+    @   00007FFBB70CE8D7  (unknown)  (unknown)
+    @   00007FFBB8F9C34C  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501: *** SIGSEGV received at time=1756362890 ***
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF799140689  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FFB976BF47F  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FFBB90C6FEF  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FFBB8FD4557  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FFBB90C692E  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF7989E42AA  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF798AAEF34  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF798AADA0F  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF798AB0D9D  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF7989E5E42  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF7989E0D50  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF79895AC74  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF7988097B1  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF798783149  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF798B4D109  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF798B45A6E  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF798B45FF8  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF7990B0B9C  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF7990B5E34  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF7990B5193  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF7987902E1  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FF7990F9A48  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FFBB70CE8D7  (unknown)  (unknown)
+[2025-08-28 14:34:50,562 E 100956 100320] (raylet.exe) logging.cc:501:     @   00007FFBB8F9C34C  (unknown)  (unknown)
+Windows fatal exception: access violation
+
+Stack (most recent call first):
+  File "C:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\worker.py", line 974 in main_loop
+  File Windows fatal exception: Windows fatal exception: Windows fatal exception: access violation
+
+access violation
+
+Windows fatal exception: access violation
+
+access violation"
+
+Stack (most recent call first):
+Stack (most recent call first):
+Stack (most recent call first):
+Stack (most recent call first):
+  File "  File   File   File ""C:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\worker.pyC:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\worker.py"", line C:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\worker.pyC:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\workers\default_worker.py", line 974 in 974 in , line "main_loop
+"  File 321 in main_loop"C:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\workers\default_worker.py, line C:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\worker.py974" in ", line , line 974321<module>
+  File  in  in main_loop<module>
+
+
+"C:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\workers\default_worker.py"  File "main_loop, line C:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\workers\default_worker.py"
+321  File , line 321 in " in <module><module>C:\Users\luoji12103\AppData\Roaming\Python\Python312\site-packages\ray\_private\workers\default_worker.py"
+
+, line 321 in <module>

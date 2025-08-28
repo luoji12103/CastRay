@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def connect_to_ray_cluster(ray_address: Optional[str] = None, namespace: str = "castray"):
-    """连接到已有的Ray集群"""
+    """连接到已有的Ray集群或启动新集群"""
     try:
         # 如果Ray已经初始化，先关闭
         if ray.is_initialized():
@@ -26,9 +26,7 @@ def connect_to_ray_cluster(ray_address: Optional[str] = None, namespace: str = "
         
         # 获取Ray集群地址
         if ray_address is None:
-            ray_address = os.environ.get('RAY_ADDRESS', 'auto')
-        
-        logger.info(f"尝试连接Ray集群: {ray_address}")
+            ray_address = os.environ.get('RAY_ADDRESS', 'local')
         
         # 配置运行时环境
         runtime_env = {}
@@ -41,27 +39,48 @@ def connect_to_ray_cluster(ray_address: Optional[str] = None, namespace: str = "
                 }
             }
         
-        # 连接到Ray集群
-        if ray_address == 'auto':
-            ray.init(address=ray_address, namespace=namespace, runtime_env=runtime_env)
+        # 简化初始化逻辑，强制使用本地模式避免连接问题
+        if ray_address in ['auto', 'local', None]:
+            # 启动本地集群
+            logger.info("启动本地Ray集群...")
+            cpu_count = os.cpu_count() or 2
+            num_cpus = max(1, cpu_count // 2)  # 使用一半CPU核心
+            
+            ray.init(
+                namespace=namespace, 
+                runtime_env=runtime_env,
+                ignore_reinit_error=True,
+                dashboard_host='127.0.0.1',  # 改为本地地址
+                dashboard_port=8265,
+                object_store_memory=100*1024*1024,  # 100MB
+                num_cpus=num_cpus,
+                _temp_dir=os.path.join(os.getcwd(), "ray_temp")  # 指定临时目录
+            )
+            logger.info("成功启动本地Ray集群")
+            logger.info(f"Ray Dashboard: http://127.0.0.1:8265")
+            logger.info(f"Ray集群资源: {ray.cluster_resources()}")
+            return True
         else:
+            # 连接到指定地址 - 不提供硬件资源参数
+            logger.info(f"尝试连接到指定Ray集群: {ray_address}")
             ray.init(address=ray_address, namespace=namespace, runtime_env=runtime_env)
-        
-        logger.info(f"成功连接到Ray集群")
-        logger.info(f"Ray集群资源: {ray.cluster_resources()}")
-        return True
+            logger.info(f"成功连接到Ray集群: {ray_address}")
+            logger.info(f"Ray集群资源: {ray.cluster_resources()}")
+            return True
         
     except Exception as e:
-        logger.error(f"连接Ray集群失败: {e}")
+        logger.error(f"Ray集群初始化失败: {e}")
         
-        # 尝试启动本地Ray
+        # 最后的后备方案：最简单的本地初始化
         try:
-            logger.info("尝试启动本地Ray集群...")
-            ray.init(namespace=namespace, runtime_env=runtime_env)
-            logger.info("成功启动本地Ray集群")
+            logger.info("尝试最简单的Ray本地初始化...")
+            if ray.is_initialized():
+                ray.shutdown()
+            ray.init(ignore_reinit_error=True, log_to_driver=False)
+            logger.info("使用简化模式成功启动Ray")
             return True
-        except Exception as local_e:
-            logger.error(f"启动本地Ray集群也失败: {local_e}")
+        except Exception as fallback_e:
+            logger.error(f"最简化Ray初始化也失败: {fallback_e}")
             return False
 
 @ray.remote

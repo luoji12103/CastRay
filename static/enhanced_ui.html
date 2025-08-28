@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CastRay - 分布式传输系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+
+        .header { 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px; 
+            padding: 30px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-connected { background: #4CAF50; }
+        .status-disconnected { background: #f44336; }
+        .status-connecting { background: #ff9800; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .card { 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+        }
+
+        .card h3::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 2px;
+            margin-right: 10px;
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 25px; 
+        }
+
+        .grid-2 { 
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
+        }
+
+        .status-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 15px; 
+        }
+
+        .status-item { 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px; 
+            border-radius: 12px; 
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .status-item:hover {
+            transform: scale(1.05);
+        }
+
+        .status-value { 
+            font-size: 2.2em; 
+            font-weight: bold; 
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .status-label { 
+            color: #666; 
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .node-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .node-card:hover {
+            border-left-color: #764ba2;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .node-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .node-status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-online {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .badge-offline {
+            background: #f44336;
+            color: white;
+        }
+
+        .node-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border: 2px solid #e1e5e9; 
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn { 
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-success { 
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        .btn-danger { 
+            background: linear-gradient(45deg, #f44336, #da190b);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+        }
+
+        .transfer-log { 
+            max-height: 400px; 
+            overflow-y: auto; 
+            border: 2px solid #e1e5e9; 
+            border-radius: 12px;
+            padding: 15px; 
+            background: rgba(248, 249, 250, 0.9);
+        }
+
+        .log-item { 
+            padding: 12px; 
+            margin-bottom: 8px; 
+            border-left: 4px solid #667eea; 
+            background: white;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .log-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .log-success { border-left-color: #4CAF50; }
+        .log-error { border-left-color: #f44336; }
+        .log-warning { border-left-color: #ff9800; }
+        .log-info { border-left-color: #2196F3; }
+
+        .log-header {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .log-time {
+            color: #666;
+            font-size: 0.8em;
+        }
+
+        .connection-status {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .connected { 
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .disconnected { 
+            background: linear-gradient(45deg, #f44336, #da190b);
+            color: white;
+        }
+
+        .connecting {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .control-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e1e5e9;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .grid, .grid-2 { grid-template-columns: 1fr; }
+            .control-row { grid-template-columns: 1fr; }
+            .status-grid { grid-template-columns: repeat(2, 1fr); }
+            .node-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>🚀 CastRay 分布式传输系统</h1>
+            <p>基于Ray集群的高性能消息与文件传输平台</p>
+        </div>
+
+        <!-- 连接状态 -->
+        <div id="connectionStatus" class="connection-status disconnected">
+            <span class="status-indicator status-disconnected"></span>
+            正在连接到服务器...
+        </div>
+
+        <!-- 系统状态概览 -->
+        <div class="grid">
+            <div class="card">
+                <h3>📊 系统状态</h3>
+                <div class="status-grid" id="systemStatus">
+                    <div class="status-item">
+                        <div class="status-value" id="totalNodes">-</div>
+                        <div class="status-label">总节点数</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="activeNodes">-</div>
+                        <div class="status-label">活跃节点</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="totalTransfers">-</div>
+                        <div class="status-label">文件传输</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="rayNodes">-</div>
+                        <div class="status-label">Ray节点</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📈 传输统计</h3>
+                <div class="status-grid" id="transferStats">
+                    <div class="status-item">
+                        <div class="status-value" id="successfulTransfers">-</div>
+                        <div class="status-label">成功传输</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="failedTransfers">-</div>
+                        <div class="status-label">失败传输</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="bytesTransferred">-</div>
+                        <div class="status-label">传输字节</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="activeTransfers">-</div>
+                        <div class="status-label">进行中</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作面板 -->
+        <div class="controls-panel">
+            <h3>🎮 操作控制台</h3>
+            <div class="control-row">
+                <div class="form-group">
+                    <label>发送节点</label>
+                    <select id="senderNode" class="form-control">
+                        <option value="">选择发送节点</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>演示文件</label>
+                    <select id="demoFile" class="form-control">
+                        <option value="config.json">📄 config.json</option>
+                        <option value="data.txt">📝 data.txt</option>
+                        <option value="report.md">📋 report.md</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>接收节点 (按住Ctrl选择多个)</label>
+                <select id="recipients" multiple class="form-control" style="min-height: 100px;">
+                </select>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="triggerManualTransfer()">
+                    🚀 发起文件传输
+                </button>
+                <button class="btn btn-success" onclick="createTestNode()">
+                    ➕ 创建测试节点
+                </button>
+                <button class="btn btn-warning" onclick="refreshStatus()">
+                    🔄 刷新状态
+                </button>
+            </div>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <div class="grid grid-2">
+            <!-- 节点状态 -->
+            <div class="card">
+                <h3>🖥️ 节点状态监控</h3>
+                <div id="nodesList">
+                    <div style="text-align: center; color: #666; padding: 40px;">
+                        <div style="font-size: 3em; margin-bottom: 10px;">⏳</div>
+                        正在加载节点信息...
+                    </div>
+                </div>
+            </div>
+
+            <!-- 传输日志 -->
+            <div class="card">
+                <h3>📝 传输活动日志</h3>
+                <div class="transfer-log" id="transferLog">
+                    <div style="text-align: center; color: #666; padding: 40px;">
+                        <div style="font-size: 3em; margin-bottom: 10px;">📡</div>
+                        监控文件传输活动中...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ray集群信息 -->
+        <div class="card">
+            <h3>⚡ Ray集群信息</h3>
+            <div id="rayClusterInfo">
+                <div style="text-align: center; color: #666; padding: 20px;">
+                    正在获取Ray集群信息...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let totalTransfers = 0;
+        let transferLog = [];
+        let nodeUpdateInterval = null;
+
+        // 连接WebSocket
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            updateConnectionStatus('connecting', '正在连接到服务器...');
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function() {
+                updateConnectionStatus('connected', '已连接到服务器');
+                loadStatus();
+                startPeriodicUpdates();
+            };
+            
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'status_update') {
+                        updateStatus(data.data);
+                    } else if (data.type === 'transfer_activity') {
+                        updateTransferLog(data.data);
+                    }
+                } catch (e) {
+                    console.error('解析WebSocket消息失败:', e);
+                }
+            };
+            
+            ws.onclose = function() {
+                updateConnectionStatus('disconnected', '连接已断开，正在重连...');
+                stopPeriodicUpdates();
+                setTimeout(connectWebSocket, 3000);
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket错误:', error);
+                updateConnectionStatus('disconnected', '连接错误，正在重连...');
+            };
+        }
+
+        // 更新连接状态
+        function updateConnectionStatus(status, message) {
+            const statusEl = document.getElementById('connectionStatus');
+            const indicator = statusEl.querySelector('.status-indicator');
+            
+            statusEl.className = `connection-status ${status}`;
+            indicator.className = `status-indicator status-${status}`;
+            statusEl.innerHTML = `<span class="status-indicator status-${status}"></span>${message}`;
+        }
+
+        // 开始定期更新
+        function startPeriodicUpdates() {
+            nodeUpdateInterval = setInterval(loadStatus, 5000);
+        }
+
+        // 停止定期更新
+        function stopPeriodicUpdates() {
+            if (nodeUpdateInterval) {
+                clearInterval(nodeUpdateInterval);
+                nodeUpdateInterval = null;
+            }
+        }
+
+        // 加载系统状态
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                updateStatus(data);
+                
+                // 加载文件传输状态
+                const transferResponse = await fetch('/api/file-transfers/status');
+                const transferData = await transferResponse.json();
+                updateTransferStats(transferData);
+                
+                // 更新Ray集群信息
+                updateRayClusterInfo(data.ray_cluster);
+            } catch (error) {
+                console.error('加载状态失败:', error);
+                addLogEntry('error', '系统错误', '无法获取系统状态: ' + error.message);
+            }
+        }
+
+        // 更新系统状态
+        function updateStatus(data) {
+            document.getElementById('totalNodes').textContent = data.total_nodes || 0;
+            document.getElementById('activeNodes').textContent = data.active_nodes || 0;
+            
+            const rayInfo = data.ray_cluster;
+            if (rayInfo && rayInfo.nodes !== undefined) {
+                document.getElementById('rayNodes').textContent = rayInfo.nodes;
+            } else {
+                document.getElementById('rayNodes').textContent = rayInfo?.error || 'N/A';
+            }
+            
+            updateNodesList(data.node_statuses || []);
+            updateNodeSelects(data.node_statuses || []);
+        }
+
+        // 更新传输统计
+        function updateTransferStats(data) {
+            let totalSuccessful = 0;
+            let totalFailed = 0;
+            let totalBytes = 0;
+            let totalActive = 0;
+            
+            Object.values(data).forEach(nodeData => {
+                if (nodeData.file_transfer_stats) {
+                    const stats = nodeData.file_transfer_stats;
+                    totalSuccessful += stats.successful_transfers || 0;
+                    totalFailed += stats.failed_transfers || 0;
+                    totalBytes += stats.bytes_transferred || 0;
+                }
+                totalActive += nodeData.active_transfers || 0;
+            });
+            
+            document.getElementById('successfulTransfers').textContent = totalSuccessful;
+            document.getElementById('failedTransfers').textContent = totalFailed;
+            document.getElementById('bytesTransferred').textContent = formatBytes(totalBytes);
+            document.getElementById('activeTransfers').textContent = totalActive;
+            document.getElementById('totalTransfers').textContent = totalSuccessful + totalFailed;
+        }
+
+        // 更新节点列表
+        function updateNodesList(nodes) {
+            const nodesList = document.getElementById('nodesList');
+            
+            if (nodes.length === 0) {
+                nodesList.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 40px;">
+                        <div style="font-size: 3em; margin-bottom: 10px;">📭</div>
+                        暂无节点信息
+                    </div>
+                `;
+                return;
+            }
+            
+            nodesList.innerHTML = nodes.map(node => {
+                const autoTransfers = node.auto_transfer_queue || 0;
+                const fileStats = node.file_transfer_stats || {};
+                const isOnline = node.is_running;
+                
+                return `
+                    <div class="node-card">
+                        <div class="node-header">
+                            <div class="node-name">
+                                🖥️ ${node.node_id}
+                            </div>
+                            <div class="node-status-badge ${isOnline ? 'badge-online' : 'badge-offline'}">
+                                ${isOnline ? 'ONLINE' : 'OFFLINE'}
+                            </div>
+                        </div>
+                        <div style="color: #666; margin-bottom: 10px;">
+                            端口: ${node.port || 'N/A'} | 
+                            自动传输: ${node.auto_transfer_enabled ? '✅ 启用' : '❌ 禁用'}
+                        </div>
+                        <div class="node-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${node.received_count || 0}</div>
+                                <div>接收消息</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${node.sent_count || 0}</div>
+                                <div>发送消息</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${fileStats.successful_transfers || 0}</div>
+                                <div>成功传输</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${fileStats.failed_transfers || 0}</div>
+                                <div>失败传输</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${autoTransfers}</div>
+                                <div>队列任务</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 更新节点选择下拉框
+        function updateNodeSelects(nodes) {
+            const senderSelect = document.getElementById('senderNode');
+            const recipientsSelect = document.getElementById('recipients');
+            
+            const options = nodes.map(node => 
+                `<option value="${node.node_id}">${node.node_id} (${node.is_running ? '在线' : '离线'})</option>`
+            ).join('');
+            
+            senderSelect.innerHTML = '<option value="">选择发送节点</option>' + options;
+            recipientsSelect.innerHTML = options;
+        }
+
+        // 更新Ray集群信息
+        function updateRayClusterInfo(rayInfo) {
+            const container = document.getElementById('rayClusterInfo');
+            
+            if (!rayInfo || rayInfo.error) {
+                container.innerHTML = `
+                    <div style="color: #f44336; text-align: center; padding: 20px;">
+                        ❌ Ray集群连接失败: ${rayInfo?.error || '未知错误'}
+                    </div>
+                `;
+                return;
+            }
+            
+            const resources = rayInfo.cluster_resources || {};
+            const available = rayInfo.available_resources || {};
+            
+            container.innerHTML = `
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-value">${rayInfo.nodes || 0}</div>
+                        <div class="status-label">Ray节点</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value">${resources.CPU || 0}</div>
+                        <div class="status-label">总CPU核心</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value">${available.CPU || 0}</div>
+                        <div class="status-label">可用CPU</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value">${formatBytes((resources.memory || 0) * 1024 * 1024)}</div>
+                        <div class="status-label">总内存</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 更新传输日志
+        function updateTransferLog(activity) {
+            transferLog.unshift({
+                ...activity,
+                timestamp: new Date().toLocaleString()
+            });
+            
+            // 保持最新50条记录
+            if (transferLog.length > 50) {
+                transferLog = transferLog.slice(0, 50);
+            }
+            
+            renderTransferLog();
+        }
+
+        // 添加日志条目
+        function addLogEntry(type, title, description) {
+            const activity = {
+                type: type,
+                node_id: 'System',
+                description: title + ': ' + description,
+                timestamp: new Date().toLocaleString()
+            };
+            updateTransferLog(activity);
+        }
+
+        // 渲染传输日志
+        function renderTransferLog() {
+            const logContainer = document.getElementById('transferLog');
+            
+            if (transferLog.length === 0) {
+                logContainer.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 40px;">
+                        <div style="font-size: 3em; margin-bottom: 10px;">📡</div>
+                        监控文件传输活动中...
+                    </div>
+                `;
+                return;
+            }
+            
+            logContainer.innerHTML = transferLog.map(log => `
+                <div class="log-item ${getLogClass(log.type)}">
+                    <div class="log-header">
+                        ${getLogIcon(log.type)} [${log.type.toUpperCase()}] ${log.node_id || 'System'}
+                    </div>
+                    <div>${log.description || JSON.stringify(log)}</div>
+                    <div class="log-time">${log.timestamp}</div>
+                </div>
+            `).join('');
+        }
+
+        // 获取日志样式类
+        function getLogClass(activityType) {
+            const classes = {
+                'transfer_start': 'log-info',
+                'transfer_complete': 'log-success',
+                'transfer_error': 'log-error',
+                'file_received': 'log-success',
+                'auto_transfer': 'log-warning',
+                'error': 'log-error',
+                'success': 'log-success',
+                'info': 'log-info'
+            };
+            return classes[activityType] || 'log-info';
+        }
+
+        // 获取日志图标
+        function getLogIcon(activityType) {
+            const icons = {
+                'transfer_start': '🚀',
+                'transfer_complete': '✅',
+                'transfer_error': '❌',
+                'file_received': '📥',
+                'auto_transfer': '🔄',
+                'error': '❌',
+                'success': '✅',
+                'info': 'ℹ️'
+            };
+            return icons[activityType] || 'ℹ️';
+        }
+
+        // 手动触发传输
+        async function triggerManualTransfer() {
+            const sender = document.getElementById('senderNode').value;
+            const fileName = document.getElementById('demoFile').value;
+            const recipientSelect = document.getElementById('recipients');
+            const recipients = Array.from(recipientSelect.selectedOptions).map(opt => opt.value);
+            
+            if (!sender) {
+                alert('请选择发送节点');
+                return;
+            }
+            
+            if (recipients.length === 0) {
+                alert('请选择至少一个接收节点');
+                return;
+            }
+            
+            try {
+                addLogEntry('info', '手动传输', `正在发起传输: ${fileName} 从 ${sender} 到 ${recipients.join(', ')}`);
+                
+                const response = await fetch('/api/file-transfers/manual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sender_id: sender,
+                        file_name: fileName,
+                        recipients: recipients
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    addLogEntry('success', '手动传输', `传输已发起: ${result.message}`);
+                    loadStatus();
+                } else {
+                    addLogEntry('error', '手动传输失败', result.message);
+                }
+            } catch (error) {
+                addLogEntry('error', '手动传输错误', error.message);
+            }
+        }
+
+        // 创建测试节点
+        async function createTestNode() {
+            const nodeId = `test_node_${Date.now()}`;
+            
+            try {
+                addLogEntry('info', '创建节点', `正在创建测试节点: ${nodeId}`);
+                
+                const response = await fetch('/api/nodes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        node_id: nodeId,
+                        port: 0
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    addLogEntry('success', '节点创建', `成功创建节点: ${nodeId}`);
+                    loadStatus();
+                } else {
+                    addLogEntry('error', '节点创建失败', result.message);
+                }
+            } catch (error) {
+                addLogEntry('error', '节点创建错误', error.message);
+            }
+        }
+
+        // 刷新状态
+        function refreshStatus() {
+            addLogEntry('info', '状态刷新', '正在刷新系统状态...');
+            loadStatus();
+        }
+
+        // 格式化字节
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 页面加载完成
+        window.addEventListener('load', function() {
+            connectWebSocket();
+            addLogEntry('info', '系统启动', 'CastRay系统界面已加载');
+        });
+
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', function() {
+            stopPeriodicUpdates();
+            if (ws) {
+                ws.close();
+            }
+        });
+    </script>
+</body>
+</html>
