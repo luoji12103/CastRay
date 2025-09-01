@@ -466,12 +466,8 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>接收节点 (可选择多个)</label>
-                <div id="recipientCheckboxes" class="checkbox-group">
-                    <div style="text-align: center; color: #666; padding: 20px;">
-                        正在加载节点列表...
-                    </div>
-                </div>
+                <label>接收节点 (可多选)</label>
+                <select id="recipients" class="form-control" multiple size="6" style="min-height:120px;"></select>
             </div>
             <div style="text-align: center; margin-top: 20px;">
                 <button class="btn" onclick="triggerManualTransfer()">
@@ -715,11 +711,10 @@
         function updateNodeSelects(nodes) {
             const senderSelect = document.getElementById('senderNode');
             const recipientsSelect = document.getElementById('recipients');
-            
+            // 只显示Ray集群节点（即所有节点）
             const options = nodes.map(node => 
-                `<option value="${node.node_id}">${node.node_id} (${node.is_running ? '在线' : '离线'})</option>`
+                `<option value="${node.node_id}">${node.node_id}</option>`
             ).join('');
-            
             senderSelect.innerHTML = '<option value="">选择发送节点</option>' + options;
             recipientsSelect.innerHTML = options;
         }
