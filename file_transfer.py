@@ -226,12 +226,22 @@ class FileTransferManager:
                 "start_time": time.time()
             }
             
+            # 立即更新统计 - 增加总传输数
             self.transfer_stats["total_transfers"] += 1
             
-            logger.info(f"发起文件传输: {file_path} -> {recipients} (ID: {file_id})")
+            # 计算传输的字节数并预先更新
+            file_size = os.path.getsize(file_path)
+            self.transfer_stats["bytes_transferred"] += file_size
+            
+            # 先假设成功，如果失败后面会调整
+            self.transfer_stats["successful_transfers"] += len(recipients)
+            
+            logger.info(f"发起文件传输: {file_path} -> {recipients} (ID: {file_id}, 大小: {file_size} bytes)")
             return file_id
             
         except Exception as e:
+            # 如果发起失败，记录失败
+            self.transfer_stats["failed_transfers"] += len(recipients) if isinstance(recipients, list) else 1
             logger.error(f"发起文件传输失败: {e}")
             raise
     
@@ -344,3 +354,40 @@ class FileTransferManager:
     def get_statistics(self) -> Dict[str, Any]:
         """获取传输统计"""
         return self.transfer_stats.copy()
+    
+    def mark_transfer_failed(self, file_id: str, failed_recipients: List[str]):
+        """标记传输失败并调整统计"""
+        try:
+            if file_id in self.active_transfers:
+                transfer = self.active_transfers[file_id]
+                
+                # 调整统计：从成功转移到失败
+                failed_count = len(failed_recipients)
+                self.transfer_stats["successful_transfers"] = max(0, 
+                    self.transfer_stats["successful_transfers"] - failed_count)
+                self.transfer_stats["failed_transfers"] += failed_count
+                
+                # 更新传输状态
+                transfer["failed_by"].extend(failed_recipients)
+                transfer["status"] = "partially_failed" if len(transfer["failed_by"]) < len(transfer["recipients"]) else "failed"
+                
+                logger.info(f"标记传输失败: {file_id}, 失败接收者: {failed_recipients}")
+                
+        except Exception as e:
+            logger.error(f"标记传输失败时出错: {e}")
+    
+    def mark_transfer_success(self, file_id: str, successful_recipients: List[str]):
+        """标记传输成功（如果之前被标记为失败）"""
+        try:
+            if file_id in self.active_transfers:
+                transfer = self.active_transfers[file_id]
+                transfer["completed_by"].extend(successful_recipients)
+                
+                # 检查是否所有接收者都完成了
+                if len(transfer["completed_by"]) >= len(transfer["recipients"]):
+                    transfer["status"] = "completed"
+                    
+                logger.info(f"标记传输成功: {file_id}, 成功接收者: {successful_recipients}")
+                
+        except Exception as e:
+            logger.error(f"标记传输成功时出错: {e}")

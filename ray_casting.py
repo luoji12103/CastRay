@@ -249,26 +249,37 @@ class CastingNode:
             
             # 根据传输模式发送请求
             success_count = 0
+            failed_recipients = []
+            
             if transfer_mode == "unicast":
                 # 单播到每个接收者
                 for recipient in recipients:
-                    # 这里需要获取接收者的地址，暂时使用本地地址示例
                     success = await self._send_message_to_recipient(request_msg, recipient)
                     if success:
                         success_count += 1
+                    else:
+                        failed_recipients.append(recipient)
             elif transfer_mode == "broadcast":
                 # 广播
                 success = await self._send_broadcast_message(request_msg)
                 if success:
                     success_count = len(recipients)
+                else:
+                    failed_recipients = recipients.copy()
             
-            logger.info(f"节点 {self.node_id} 发起文件传输: {file_path} -> {recipients}")
+            # 如果有失败的接收者，更新统计
+            if failed_recipients:
+                self.file_transfer_manager.mark_transfer_failed(file_id, failed_recipients)
+            
+            logger.info(f"节点 {self.node_id} 发起文件传输: {file_path} -> {recipients}, 成功: {success_count}, 失败: {len(failed_recipients)}")
             
             return {
                 "success": success_count > 0,
                 "file_id": file_id,
                 "recipients_notified": success_count,
-                "transfer_mode": transfer_mode
+                "failed_recipients": failed_recipients,
+                "transfer_mode": transfer_mode,
+                "message": f"成功通知 {success_count}/{len(recipients)} 个接收者"
             }
             
         except Exception as e:
@@ -278,22 +289,48 @@ class CastingNode:
     async def _send_message_to_recipient(self, message: dict, recipient_id: str):
         """向特定接收者发送消息"""
         try:
-            # 这里应该根据recipient_id查找实际的网络地址
-            # 暂时使用示例端口映射
-            port_mapping = {
-                "node_1": 64406, "node_2": 64409, "node_3": 64412
-            }
-            
-            if recipient_id in port_mapping:
-                message_data = json.dumps(message).encode('utf-8')
-                self.socket.sendto(message_data, ('localhost', port_mapping[recipient_id]))
-                return True
-            else:
-                logger.warning(f"未找到接收者地址: {recipient_id}")
-                return False
+            # 尝试从Ray shared state获取节点端口映射
+            try:
+                # 尝试获取集群管理器的端口映射
+                cluster_manager = ray.get_actor("cluster_manager")
+                node_ports = await cluster_manager.get_node_ports.remote()
+                
+                if recipient_id in node_ports:
+                    recipient_port = node_ports[recipient_id]
+                    message_data = json.dumps(message).encode('utf-8')
+                    if self.socket:
+                        self.socket.sendto(message_data, ('localhost', recipient_port))
+                        logger.debug(f"发送消息到 {recipient_id} (端口: {recipient_port})")
+                    return True
+                else:
+                    logger.warning(f"端口映射中未找到接收者: {recipient_id}")
+                    self.file_transfer_manager.transfer_stats["failed_transfers"] += 1
+                    return False
+                    
+            except Exception as ray_error:
+                logger.debug(f"无法从Ray获取端口映射: {ray_error}")
+                # 回退：直接尝试从其他节点获取端口
+                if recipient_id in self.get_known_node_ports():
+                    recipient_port = self.get_known_node_ports()[recipient_id]
+                    message_data = json.dumps(message).encode('utf-8')
+                    if self.socket:
+                        self.socket.sendto(message_data, ('localhost', recipient_port))
+                        logger.debug(f"发送消息到 {recipient_id} (端口: {recipient_port}) [回退模式]")
+                    return True
+                else:
+                    logger.warning(f"未找到接收者地址: {recipient_id}")
+                    self.file_transfer_manager.transfer_stats["failed_transfers"] += 1
+                    return False
+                    
         except Exception as e:
             logger.error(f"发送消息到 {recipient_id} 失败: {e}")
+            self.file_transfer_manager.transfer_stats["failed_transfers"] += 1
             return False
+    
+    def get_known_node_ports(self):
+        """获取已知的节点端口（硬编码作为回退）"""
+        # 这是一个回退机制，在无法从Ray获取动态端口时使用
+        return {}
     
     async def _send_broadcast_message(self, message: dict):
         """发送广播消息"""
@@ -566,6 +603,10 @@ class CastingCluster:
         except Exception as e:
             logger.error(f"移除节点 {node_id} 失败: {e}")
             return False
+    
+    async def get_node_ports(self) -> Dict[str, int]:
+        """获取所有节点的端口映射"""
+        return self.node_ports.copy()
     
     async def send_message(self, cast_message: CastMessage) -> CastResponse:
         """发送消息"""

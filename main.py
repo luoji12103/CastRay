@@ -58,7 +58,7 @@ def load_config():
         },
         "web_server": {
             "host": "0.0.0.0", 
-            "port": int(os.environ.get("CASTRAY_PORT", "8000")),
+            "port": int(os.environ.get("CASTRAY_PORT", "8001")),
             "log_level": "info"
         },
         "file_transfer": {
