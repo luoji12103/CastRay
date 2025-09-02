@@ -11,9 +11,15 @@ import platform
 from pathlib import Path
 from typing import List, Dict
 import logging
+from datetime import datetime
 
 from models import CastMessage, CastType, MessageType, CastResponse, SystemStatus
 from ray_casting import cluster, scheduler
+from file_generator import (
+    create_sample_file, parse_size_string, format_size, 
+    validate_file_size, get_available_content_types, 
+    PRESET_SIZES, create_preset_file
+)
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -648,6 +654,395 @@ async def toggle_auto_transfer(request: dict):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"切换自动传输失败: {str(e)}")
+
+# ============ 文件生成和传输功能 ============
+
+@app.get("/api/file-generator/presets")
+async def get_file_size_presets():
+    """获取预设的文件大小选项"""
+    return {
+        "success": True,
+        "presets": {
+            name: {
+                "size_bytes": size,
+                "size_formatted": format_size(size),
+                "description": f"预设 {name.title()} 文件"
+            }
+            for name, size in PRESET_SIZES.items()
+        },
+        "content_types": get_available_content_types()
+    }
+
+@app.get("/api/file-generator/info")
+async def get_file_generator_info():
+    """获取文件生成器信息和限制"""
+    max_size = 1024 * 1024 * 1024  # 1GB 限制
+    return {
+        "success": True,
+        "max_file_size": max_size,
+        "max_file_size_formatted": format_size(max_size),
+        "supported_units": ["B", "KB", "MB", "GB"],
+        "content_types": get_available_content_types(),
+        "examples": [
+            "100B - 100 字节",
+            "1KB - 1 千字节",
+            "1.5MB - 1.5 兆字节",
+            "1GB - 1 吉字节"
+        ]
+    }
+
+@app.post("/api/file-generator/create")
+async def create_sample_file_api(request: dict):
+    """创建指定大小的示例文件"""
+    try:
+        # 解析请求参数
+        size_input = request.get("size", "1KB")
+        content_type = request.get("content_type", "text")
+        file_name = request.get("file_name", "")
+        include_metadata = request.get("include_metadata", True)
+        
+        # 解析文件大小
+        try:
+            size_bytes = parse_size_string(size_input)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=f"无效的文件大小格式: {str(e)}")
+        
+        # 验证文件大小
+        max_size = 1024 * 1024 * 1024  # 1GB
+        if not validate_file_size(size_bytes, max_size):
+            raise HTTPException(
+                status_code=400, 
+                detail=f"文件大小超出限制。最大允许: {format_size(max_size)}"
+            )
+        
+        # 生成文件名
+        if not file_name:
+            timestamp = int(time.time())
+            size_str = format_size(size_bytes).replace(" ", "").replace(".", "_")
+            file_name = f"sample_{size_str}_{content_type}_{timestamp}.txt"
+        
+        # 确保文件名安全
+        file_name = "".join(c for c in file_name if c.isalnum() or c in "._-")
+        if not file_name.endswith(('.txt', '.bin', '.dat')):
+            file_name += '.txt'
+        
+        # 创建文件路径
+        file_path = static_dir / file_name
+        
+        # 检查文件是否已存在
+        if file_path.exists():
+            timestamp = int(time.time())
+            name_parts = file_path.stem, timestamp, file_path.suffix
+            file_path = static_dir / f"{name_parts[0]}_{name_parts[1]}{name_parts[2]}"
+        
+        # 创建示例文件
+        file_info = create_sample_file(
+            file_path=file_path,
+            size_bytes=size_bytes,
+            content_type=content_type,
+            include_metadata=include_metadata
+        )
+        
+        # 添加额外信息
+        file_info.update({
+            "download_url": f"/static/{file_path.name}",
+            "size_formatted": format_size(file_info["actual_size"]),
+            "created_time": time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        
+        return {
+            "success": True,
+            "message": f"成功创建示例文件: {file_path.name}",
+            "file_info": file_info
+        }
+        
+    except Exception as e:
+        logger.error(f"创建示例文件失败: {e}")
+        raise HTTPException(status_code=500, detail=f"创建示例文件失败: {str(e)}")
+
+@app.post("/api/file-generator/create-preset")
+async def create_preset_file_api(request: dict):
+    """创建预设大小的示例文件"""
+    try:
+        preset_name = request.get("preset", "medium")
+        content_type = request.get("content_type", "text")
+        custom_name = request.get("file_name", "")
+        
+        # 验证预设名称
+        if preset_name not in PRESET_SIZES:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"无效的预设名称。可用选项: {list(PRESET_SIZES.keys())}"
+            )
+        
+        # 生成文件名
+        if custom_name:
+            file_name = custom_name
+        else:
+            timestamp = int(time.time())
+            size_str = format_size(PRESET_SIZES[preset_name]).replace(" ", "").replace(".", "_")
+            file_name = f"preset_{preset_name}_{size_str}_{content_type}_{timestamp}.txt"
+        
+        # 确保文件名安全
+        file_name = "".join(c for c in file_name if c.isalnum() or c in "._-")
+        if not file_name.endswith(('.txt', '.bin', '.dat')):
+            file_name += '.txt'
+        
+        file_path = static_dir / file_name
+        
+        # 创建预设文件
+        file_info = create_preset_file(
+            preset_name=preset_name,
+            file_path=file_path,
+            content_type=content_type
+        )
+        
+        # 添加额外信息
+        file_info.update({
+            "preset_name": preset_name,
+            "download_url": f"/static/{file_path.name}",
+            "size_formatted": format_size(file_info["actual_size"]),
+            "created_time": time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        
+        return {
+            "success": True,
+            "message": f"成功创建预设文件: {file_path.name}",
+            "file_info": file_info
+        }
+        
+    except Exception as e:
+        logger.error(f"创建预设文件失败: {e}")
+        raise HTTPException(status_code=500, detail=f"创建预设文件失败: {str(e)}")
+
+@app.post("/api/file-generator/create-and-transfer")
+async def create_and_transfer_file(request: dict):
+    """创建示例文件并立即传输"""
+    try:
+        # 创建文件部分的参数
+        size_input = request.get("size", "1KB")
+        content_type = request.get("content_type", "text")
+        include_metadata = request.get("include_metadata", True)
+        
+        # 传输部分的参数
+        sender_id = request.get("sender_id")
+        recipients = request.get("recipients", [])
+        
+        # 验证传输参数
+        if not sender_id or sender_id not in cluster.nodes:
+            raise HTTPException(status_code=404, detail="发送节点未找到")
+        
+        if not recipients:
+            raise HTTPException(status_code=400, detail="请指定接收节点")
+        
+        # 解析文件大小
+        try:
+            size_bytes = parse_size_string(size_input)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=f"无效的文件大小格式: {str(e)}")
+        
+        # 验证文件大小
+        max_size = 1024 * 1024 * 1024  # 1GB
+        if not validate_file_size(size_bytes, max_size):
+            raise HTTPException(
+                status_code=400, 
+                detail=f"文件大小超出限制。最大允许: {format_size(max_size)}"
+            )
+        
+        # 生成唯一文件名
+        timestamp = int(time.time())
+        size_str = format_size(size_bytes).replace(" ", "").replace(".", "_")
+        file_name = f"transfer_{size_str}_{content_type}_{timestamp}.txt"
+        file_path = static_dir / file_name
+        
+        # 创建示例文件
+        file_info = create_sample_file(
+            file_path=file_path,
+            size_bytes=size_bytes,
+            content_type=content_type,
+            include_metadata=include_metadata
+        )
+        
+        # 验证接收节点
+        sender_node = cluster.nodes[sender_id]
+        valid_recipients = []
+        for recipient_id in recipients:
+            if recipient_id in cluster.nodes:
+                valid_recipients.append(recipient_id)
+        
+        if not valid_recipients:
+            raise HTTPException(status_code=400, detail="没有有效的接收节点")
+        
+        # 执行文件传输
+        transfer_results = []
+        for recipient_id in valid_recipients:
+            try:
+                result = await sender_node.send_file_to_node(
+                    file_path=str(file_path),
+                    recipient_id=recipient_id
+                )
+                transfer_results.append({
+                    "recipient_id": recipient_id,
+                    "success": True,
+                    "result": result
+                })
+            except Exception as e:
+                transfer_results.append({
+                    "recipient_id": recipient_id,
+                    "success": False,
+                    "error": str(e)
+                })
+        
+        # 统计传输结果
+        successful_transfers = [r for r in transfer_results if r["success"]]
+        failed_transfers = [r for r in transfer_results if not r["success"]]
+        
+        # 广播传输状态更新
+        if websocket_connections:
+            notification = {
+                "type": "file_generated_and_transferred",
+                "data": {
+                    "file_name": file_name,
+                    "file_size": format_size(file_info["actual_size"]),
+                    "sender_id": sender_id,
+                    "successful_transfers": len(successful_transfers),
+                    "failed_transfers": len(failed_transfers),
+                    "total_recipients": len(recipients)
+                }
+            }
+            for ws in websocket_connections:
+                try:
+                    await ws.send_text(json.dumps(notification))
+                except:
+                    pass
+        
+        return {
+            "success": True,
+            "message": f"成功创建并传输文件: {file_name}",
+            "file_info": {
+                **file_info,
+                "size_formatted": format_size(file_info["actual_size"]),
+                "created_time": time.strftime("%Y-%m-%d %H:%M:%S")
+            },
+            "transfer_summary": {
+                "total_recipients": len(recipients),
+                "successful_transfers": len(successful_transfers),
+                "failed_transfers": len(failed_transfers),
+                "transfer_results": transfer_results
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"创建并传输文件失败: {e}")
+        raise HTTPException(status_code=500, detail=f"创建并传输文件失败: {str(e)}")
+
+@app.get("/api/file-generator/files")
+async def list_generated_files():
+    """列出所有生成的示例文件"""
+    try:
+        files = []
+        
+        # 扫描static目录中的文件
+        for file_path in static_dir.iterdir():
+            if file_path.is_file() and (
+                file_path.name.startswith(('sample_', 'preset_', 'transfer_')) or
+                file_path.suffix.lower() in ['.txt', '.bin', '.dat']
+            ):
+                stat = file_path.stat()
+                files.append({
+                    "file_name": file_path.name,
+                    "file_size": stat.st_size,
+                    "size_formatted": format_size(stat.st_size),
+                    "created_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_ctime)),
+                    "modified_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_mtime)),
+                    "download_url": f"/static/{file_path.name}",
+                    "is_generated": file_path.name.startswith(('sample_', 'preset_', 'transfer_'))
+                })
+        
+        # 按创建时间排序（最新的在前）
+        files.sort(key=lambda x: x["created_time"], reverse=True)
+        
+        return {
+            "success": True,
+            "files": files,
+            "total_count": len(files),
+            "total_size": sum(f["file_size"] for f in files),
+            "total_size_formatted": format_size(sum(f["file_size"] for f in files))
+        }
+        
+    except Exception as e:
+        logger.error(f"列出生成文件失败: {e}")
+        raise HTTPException(status_code=500, detail=f"列出生成文件失败: {str(e)}")
+
+@app.delete("/api/file-generator/files/{file_name}")
+async def delete_generated_file(file_name: str):
+    """删除指定的生成文件"""
+    try:
+        # 确保文件名安全
+        file_name = "".join(c for c in file_name if c.isalnum() or c in "._-")
+        file_path = static_dir / file_name
+        
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="文件不存在")
+        
+        if not file_path.is_file():
+            raise HTTPException(status_code=400, detail="不是有效的文件")
+        
+        # 删除文件
+        file_size = file_path.stat().st_size
+        file_path.unlink()
+        
+        return {
+            "success": True,
+            "message": f"成功删除文件: {file_name}",
+            "deleted_size": file_size,
+            "deleted_size_formatted": format_size(file_size)
+        }
+        
+    except Exception as e:
+        logger.error(f"删除文件失败: {e}")
+        raise HTTPException(status_code=500, detail=f"删除文件失败: {str(e)}")
+
+@app.post("/api/file-generator/create-demo")
+async def create_demo_file(request: dict):
+    """为演示文件列表创建自定义大小的文件"""
+    try:
+        size_str = request.get("size", "1MB")
+        content_type = request.get("content_type", "random")
+        
+        # 确保demo_files目录存在
+        demo_dir = Path("demo_files")
+        demo_dir.mkdir(exist_ok=True)
+        
+        # 解析文件大小
+        actual_size = parse_size_string(size_str)
+        
+        # 生成文件名
+        timestamp = datetime.now().strftime("%H%M%S")
+        formatted_size_name = format_size(actual_size).replace(' ', '_').lower()
+        filename = f"custom_test_{formatted_size_name}_{timestamp}.bin"
+        file_path = demo_dir / filename
+        
+        # 创建文件
+        success = create_sample_file(str(file_path), actual_size, content_type)
+        
+        if success:
+            return {
+                "success": True,
+                "filename": filename,
+                "actual_size": actual_size,
+                "formatted_size": format_size(actual_size),
+                "content_type": content_type,
+                "path": str(file_path)
+            }
+        else:
+            return {"success": False, "message": "文件创建失败"}
+            
+    except Exception as e:
+        logger.error(f"创建演示文件失败: {e}")
+        return {"success": False, "message": f"创建演示文件失败: {str(e)}"}
+
+# ============ 文件生成和传输功能结束 ============
 
 if __name__ == "__main__":
     # 从配置文件获取Web服务器设置

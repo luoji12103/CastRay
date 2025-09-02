@@ -180,6 +180,29 @@
             color: white;
         }
 
+        .badge-ray {
+            background: linear-gradient(45deg, #9c27b0, #673ab7);
+            color: white;
+        }
+
+        .badge-demo {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .badge-info {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .node-type-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
         .node-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -383,286 +406,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(45deg, #764ba2, #667eea);
         }
-
-        /* 文件生成器样式 */
-        .file-generator-container {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 15px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .generator-section {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .generator-section h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 8px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .input-group input,
-        .input-group select {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        .input-group input:focus,
-        .input-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .preset-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .preset-btn {
-            padding: 10px 15px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .preset-btn:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: #667eea;
-        }
-
-        .preset-btn-size {
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .preset-btn:hover .preset-btn-size {
-            color: white;
-        }
-
-        .generator-status {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .status-message {
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .status-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            width: 0%;
-            transition: width 0.3s ease;
-            animation: progressAnimation 2s infinite;
-        }
-
-        @keyframes progressAnimation {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .generated-files {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .generated-files h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 8px;
-        }
-
-        .file-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #e9ecef;
-            transition: background-color 0.3s ease;
-        }
-
-        .file-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .file-item:last-child {
-            border-bottom: none;
-        }
-
-        .file-info {
-            flex: 1;
-        }
-
-        .file-name {
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 2px;
-        }
-
-        .file-details {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .file-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 12px;
-            border-radius: 4px;
-        }
-
-        .btn-download {
-            background: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-download:hover {
-            background: #218838;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-delete:hover {
-            background: #c82333;
-        }
-
-        /* 自定义文件区域样式 */
-        #customFileSection {
-            background: #f8f9fa;
-            border: 2px dashed #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-        }
-
-        #customFileSection.show {
-            border-color: #667eea;
-            background: #f0f2ff;
-        }
-
-        .help-text {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .help-text::before {
-            content: "💡";
-            font-size: 14px;
-        }
-
-        .form-control[type="number"] {
-            text-align: center;
-        }
-
-        .custom-file-status {
-            margin-top: 10px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .custom-file-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .custom-file-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .custom-file-loading {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
     </style>
 </head>
 <body>
@@ -693,12 +436,12 @@
                         <div class="status-label">活跃节点</div>
                     </div>
                     <div class="status-item">
-                        <div class="status-value" id="totalTransfers">-</div>
-                        <div class="status-label">文件传输</div>
+                        <div class="status-value" id="rayClusterNodes">-</div>
+                        <div class="status-label">Ray节点</div>
                     </div>
                     <div class="status-item">
-                        <div class="status-value" id="rayNodes">-</div>
-                        <div class="status-label">Ray节点</div>
+                        <div class="status-value" id="castingNodes">-</div>
+                        <div class="status-label">传输节点</div>
                     </div>
                 </div>
             </div>
@@ -715,8 +458,8 @@
                         <div class="status-label">失败传输</div>
                     </div>
                     <div class="status-item">
-                        <div class="status-value" id="bytesTransferred">-</div>
-                        <div class="status-label">传输字节</div>
+                        <div class="status-value" id="totalTransfers">-</div>
+                        <div class="status-label">总传输数</div>
                     </div>
                     <div class="status-item">
                         <div class="status-value" id="activeTransfers">-</div>
@@ -742,35 +485,16 @@
                         <option value="config.json">📄 config.json</option>
                         <option value="data.txt">📝 data.txt</option>
                         <option value="report.md">📋 report.md</option>
-                        <option value="custom">🎯 创建自定义大小文件</option>
                     </select>
-                </div>
-                
-                <!-- 自定义文件大小输入区域 -->
-                <div class="form-group" id="customFileSection" style="display: none;">
-                    <label>🎯 自定义测试文件大小</label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="number" id="customFileSize" class="form-control" 
-                               placeholder="输入数字" min="1" max="10240" 
-                               style="flex: 2;">
-                        <select id="customFileSizeUnit" class="form-control" style="flex: 1;">
-                            <option value="KB">KB</option>
-                            <option value="MB" selected>MB</option>
-                            <option value="GB">GB</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="createCustomTestFile()" 
-                                style="flex: 1; white-space: nowrap;">
-                            📝 创建
-                        </button>
-                    </div>
-                    <div class="help-text" style="margin-top: 5px; font-size: 12px; color: #666;">
-                        建议范围：1KB - 10GB，文件将被创建到 demo_files 目录
-                    </div>
                 </div>
             </div>
             <div class="form-group">
-                <label>接收节点 (可多选)</label>
-                <select id="recipients" class="form-control" multiple size="6" style="min-height:120px;"></select>
+                <label>接收节点 (可选择多个)</label>
+                <div id="recipientCheckboxes" class="checkbox-group">
+                    <div style="text-align: center; color: #666; padding: 20px;">
+                        正在加载节点列表...
+                    </div>
+                </div>
             </div>
             <div style="text-align: center; margin-top: 20px;">
                 <button class="btn" onclick="triggerManualTransfer()">
@@ -778,6 +502,9 @@
                 </button>
                 <button class="btn btn-success" onclick="createTestNode()">
                     ➕ 创建测试节点
+                </button>
+                <button class="btn btn-warning" onclick="refreshRayNodes()">
+                    🔄 刷新Ray节点
                 </button>
                 <button class="btn btn-warning" onclick="refreshStatus()">
                     🔄 刷新状态
@@ -805,98 +532,6 @@
                     <div style="text-align: center; color: #666; padding: 40px;">
                         <div style="font-size: 3em; margin-bottom: 10px;">📡</div>
                         监控文件传输活动中...
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 文件生成器 -->
-        <div class="card">
-            <h3>🎯 智能文件生成器</h3>
-            <div class="file-generator-container">
-                <div class="grid grid-3">
-                    <!-- 自定义文件大小 -->
-                    <div class="generator-section">
-                        <h4>📏 自定义大小</h4>
-                        <div class="input-group">
-                            <label for="customSize">文件大小:</label>
-                            <input type="text" id="customSize" placeholder="例如: 1MB, 500KB, 10GB" value="1MB">
-                        </div>
-                        <div class="input-group">
-                            <label for="customContentType">内容类型:</label>
-                            <select id="customContentType">
-                                <option value="text">文本内容</option>
-                                <option value="random">随机数据</option>
-                                <option value="pattern">重复模式</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="customFileName">文件名 (可选):</label>
-                            <input type="text" id="customFileName" placeholder="留空自动生成">
-                        </div>
-                        <button class="btn-primary" onclick="createCustomFile()">
-                            🎯 创建自定义文件
-                        </button>
-                    </div>
-
-                    <!-- 预设文件大小 -->
-                    <div class="generator-section">
-                        <h4>⚡ 快速预设</h4>
-                        <div class="preset-buttons" id="presetButtons">
-                            <div style="text-align: center; color: #666; padding: 20px;">
-                                正在加载预设选项...
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label for="presetContentType">内容类型:</label>
-                            <select id="presetContentType">
-                                <option value="text">文本内容</option>
-                                <option value="random">随机数据</option>
-                                <option value="pattern">重复模式</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- 生成并传输 -->
-                    <div class="generator-section">
-                        <h4>🚀 生成并传输</h4>
-                        <div class="input-group">
-                            <label for="transferSize">文件大小:</label>
-                            <input type="text" id="transferSize" placeholder="例如: 1MB" value="500KB">
-                        </div>
-                        <div class="input-group">
-                            <label for="transferSender">发送节点:</label>
-                            <select id="transferSender">
-                                <option value="">选择发送节点</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="transferRecipients">接收节点:</label>
-                            <select id="transferRecipients" multiple>
-                                <option value="">加载节点中...</option>
-                            </select>
-                        </div>
-                        <button class="btn-success" onclick="createAndTransferFile()">
-                            🚀 生成并传输
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 生成状态 -->
-                <div class="generator-status" id="generatorStatus" style="display: none;">
-                    <div class="status-message" id="statusMessage"></div>
-                    <div class="progress-bar" id="progressBar" style="display: none;">
-                        <div class="progress-fill"></div>
-                    </div>
-                </div>
-
-                <!-- 生成的文件列表 -->
-                <div class="generated-files" id="generatedFiles">
-                    <h4>📁 最近生成的文件</h4>
-                    <div id="filesList" style="max-height: 200px; overflow-y: auto;">
-                        <div style="text-align: center; color: #666; padding: 20px;">
-                            暂无生成的文件
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1006,12 +641,12 @@
         function updateStatus(data) {
             document.getElementById('totalNodes').textContent = data.total_nodes || 0;
             document.getElementById('activeNodes').textContent = data.active_nodes || 0;
+            document.getElementById('rayClusterNodes').textContent = data.ray_cluster_nodes_count || 0;
+            document.getElementById('castingNodes').textContent = data.casting_nodes_count || 0;
             
             const rayInfo = data.ray_cluster;
             if (rayInfo && rayInfo.nodes !== undefined) {
-                document.getElementById('rayNodes').textContent = rayInfo.nodes;
-            } else {
-                document.getElementById('rayNodes').textContent = rayInfo?.error || 'N/A';
+                // Ray集群信息已通过rayClusterNodes显示
             }
             
             updateNodesList(data.node_statuses || []);
@@ -1037,9 +672,8 @@
             
             document.getElementById('successfulTransfers').textContent = totalSuccessful;
             document.getElementById('failedTransfers').textContent = totalFailed;
-            document.getElementById('bytesTransferred').textContent = formatBytes(totalBytes);
-            document.getElementById('activeTransfers').textContent = totalActive;
             document.getElementById('totalTransfers').textContent = totalSuccessful + totalFailed;
+            document.getElementById('activeTransfers').textContent = totalActive;
         }
 
         // 更新节点列表
@@ -1060,21 +694,52 @@
                 const autoTransfers = node.auto_transfer_queue || 0;
                 const fileStats = node.file_transfer_stats || {};
                 const isOnline = node.is_running;
+                const nodeType = node.node_type || 'casting_node';
+                
+                // 根据节点类型选择图标和颜色
+                let nodeIcon = '🖥️';
+                let nodeTypeLabel = '传输节点';
+                let nodeTypeClass = 'badge-info';
+                
+                if (nodeType === 'ray_cluster') {
+                    nodeIcon = '⚡';
+                    nodeTypeLabel = 'Ray集群节点';
+                    nodeTypeClass = 'badge-ray';
+                } else if (node.node_id.startsWith('demo_')) {
+                    nodeIcon = '🧪';
+                    nodeTypeLabel = '演示节点';
+                    nodeTypeClass = 'badge-demo';
+                }
+                
+                // Ray集群节点的额外信息
+                let rayInfo = '';
+                if (nodeType === 'ray_cluster' && node.ray_address) {
+                    rayInfo = `<div style="color: #666; font-size: 0.8em; margin-top: 5px;">
+                        Ray节点: ${node.ray_node_id?.substring(0,8) || 'Unknown'}<br>
+                        地址: ${node.ray_address}
+                    </div>`;
+                }
                 
                 return `
                     <div class="node-card">
                         <div class="node-header">
                             <div class="node-name">
-                                🖥️ ${node.node_id}
+                                ${nodeIcon} ${node.node_id}
                             </div>
-                            <div class="node-status-badge ${isOnline ? 'badge-online' : 'badge-offline'}">
-                                ${isOnline ? 'ONLINE' : 'OFFLINE'}
+                            <div style="display: flex; gap: 5px;">
+                                <div class="node-type-badge ${nodeTypeClass}">
+                                    ${nodeTypeLabel}
+                                </div>
+                                <div class="node-status-badge ${isOnline ? 'badge-online' : 'badge-offline'}">
+                                    ${isOnline ? 'ONLINE' : 'OFFLINE'}
+                                </div>
                             </div>
                         </div>
                         <div style="color: #666; margin-bottom: 10px;">
                             端口: ${node.port || 'N/A'} | 
                             自动传输: ${node.auto_transfer_enabled ? '✅ 启用' : '❌ 禁用'}
                         </div>
+                        ${rayInfo}
                         <div class="node-stats">
                             <div class="stat-item">
                                 <div class="stat-value">${node.received_count || 0}</div>
@@ -1105,13 +770,39 @@
         // 更新节点选择下拉框
         function updateNodeSelects(nodes) {
             const senderSelect = document.getElementById('senderNode');
-            const recipientsSelect = document.getElementById('recipients');
-            // 只显示Ray集群节点（即所有节点）
+            const recipientCheckboxes = document.getElementById('recipientCheckboxes');
+            
             const options = nodes.map(node => 
-                `<option value="${node.node_id}">${node.node_id}</option>`
+                `<option value="${node.node_id}">${node.node_id} (${node.is_running ? '在线' : '离线'})</option>`
             ).join('');
+            
             senderSelect.innerHTML = '<option value="">选择发送节点</option>' + options;
-            recipientsSelect.innerHTML = options;
+            
+            // 更新接收节点复选框
+            if (nodes.length === 0) {
+                recipientCheckboxes.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 20px;">
+                        暂无可用节点
+                    </div>
+                `;
+            } else {
+                recipientCheckboxes.innerHTML = nodes.map(node => {
+                    const nodeType = node.node_type || 'casting_node';
+                    let nodeIcon = '🖥️';
+                    if (nodeType === 'ray_cluster') {
+                        nodeIcon = '⚡';
+                    } else if (node.node_id.startsWith('demo_')) {
+                        nodeIcon = '🧪';
+                    }
+                    
+                    return `
+                        <label style="display: flex; align-items: center; padding: 8px; margin: 4px 0; background: rgba(255,255,255,0.7); border-radius: 6px; cursor: pointer;">
+                            <input type="checkbox" value="${node.node_id}" style="margin-right: 8px;">
+                            ${nodeIcon} ${node.node_id} (${node.is_running ? '在线' : '离线'})
+                        </label>
+                    `;
+                }).join('');
+            }
         }
 
         // 更新Ray集群信息
@@ -1237,21 +928,22 @@
         async function triggerManualTransfer() {
             const sender = document.getElementById('senderNode').value;
             const fileName = document.getElementById('demoFile').value;
-            const recipientSelect = document.getElementById('recipients');
-            const recipients = Array.from(recipientSelect.selectedOptions).map(opt => opt.value);
+            const recipientCheckboxes = document.getElementById('recipientCheckboxes');
+            const selectedRecipients = Array.from(recipientCheckboxes.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
             
             if (!sender) {
                 alert('请选择发送节点');
                 return;
             }
             
-            if (recipients.length === 0) {
+            if (selectedRecipients.length === 0) {
                 alert('请选择至少一个接收节点');
                 return;
             }
             
             try {
-                addLogEntry('info', '手动传输', `正在发起传输: ${fileName} 从 ${sender} 到 ${recipients.join(', ')}`);
+                addLogEntry('info', '手动传输', `正在发起传输: ${fileName} 从 ${sender} 到 ${selectedRecipients.join(', ')}`);
                 
                 const response = await fetch('/api/file-transfers/manual', {
                     method: 'POST',
@@ -1259,7 +951,7 @@
                     body: JSON.stringify({
                         sender_id: sender,
                         file_name: fileName,
-                        recipients: recipients
+                        recipients: selectedRecipients
                     })
                 });
                 
@@ -1303,6 +995,25 @@
             }
         }
 
+        // 刷新Ray节点
+        async function refreshRayNodes() {
+            try {
+                addLogEntry('info', 'Ray节点刷新', '正在刷新Ray集群节点...');
+                
+                const response = await fetch('/api/ray-nodes/refresh');
+                const result = await response.json();
+                
+                if (result.success) {
+                    addLogEntry('success', 'Ray节点刷新', `成功刷新 ${result.ray_nodes_count} 个Ray集群节点`);
+                    loadStatus();
+                } else {
+                    addLogEntry('error', 'Ray节点刷新失败', result.message || '未知错误');
+                }
+            } catch (error) {
+                addLogEntry('error', 'Ray节点刷新错误', error.message);
+            }
+        }
+
         // 刷新状态
         function refreshStatus() {
             addLogEntry('info', '状态刷新', '正在刷新系统状态...');
@@ -1318,204 +1029,10 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // 文件生成器功能
-        let generatedFiles = [];
-
-        function createCustomFile() {
-            const size = document.getElementById('custom-size').value;
-            const unit = document.getElementById('custom-unit').value;
-            const type = document.getElementById('custom-type').value;
-            
-            if (!size || isNaN(size) || size <= 0) {
-                showGeneratorMessage('请输入有效的文件大小', 'error');
-                return;
-            }
-
-            const sizeStr = size + unit;
-            createFileOnServer(sizeStr, type, false);
-        }
-
-        function createPresetFile(sizeStr) {
-            createFileOnServer(sizeStr, 'random', false);
-        }
-
-        function createAndTransferFile() {
-            const size = document.getElementById('transfer-size').value;
-            const unit = document.getElementById('transfer-unit').value;
-            const type = document.getElementById('transfer-type').value;
-            
-            if (!size || isNaN(size) || size <= 0) {
-                showGeneratorMessage('请输入有效的文件大小', 'error');
-                return;
-            }
-
-            const sizeStr = size + unit;
-            createFileOnServer(sizeStr, type, true);
-        }
-
-        function createFileOnServer(sizeStr, contentType, autoTransfer) {
-            showGeneratorMessage('正在创建文件...', 'info');
-            showProgress(true);
-
-            const url = autoTransfer ? '/api/file-generator/create-and-transfer' : '/api/file-generator/create';
-            
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    size: sizeStr,
-                    content_type: contentType
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                showProgress(false);
-                if (data.success) {
-                    if (autoTransfer) {
-                        showGeneratorMessage(`文件创建并传输成功！文件: ${data.filename}, 大小: ${data.formatted_size}`, 'success');
-                        if (data.transfer_info) {
-                            showGeneratorMessage(`传输信息: ${JSON.stringify(data.transfer_info)}`, 'info');
-                        }
-                    } else {
-                        showGeneratorMessage(`文件创建成功！文件: ${data.filename}, 大小: ${data.formatted_size}`, 'success');
-                        generatedFiles.push({
-                            filename: data.filename,
-                            size: data.actual_size,
-                            formatted_size: data.formatted_size,
-                            content_type: contentType,
-                            created_at: new Date().toLocaleString()
-                        });
-                        updateGeneratedFilesList();
-                    }
-                } else {
-                    showGeneratorMessage(`创建失败: ${data.message}`, 'error');
-                }
-            })
-            .catch(error => {
-                showProgress(false);
-                console.error('Error creating file:', error);
-                showGeneratorMessage('创建文件时发生错误', 'error');
-            });
-        }
-
-        function showGeneratorMessage(message, type) {
-            const statusDiv = document.getElementById('generator-status');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `status-message status-${type}`;
-            messageDiv.textContent = message;
-            
-            statusDiv.innerHTML = '';
-            statusDiv.appendChild(messageDiv);
-            
-            // 自动清除消息
-            setTimeout(() => {
-                if (statusDiv.contains(messageDiv)) {
-                    statusDiv.removeChild(messageDiv);
-                }
-            }, 5000);
-        }
-
-        function showProgress(show) {
-            const progressBar = document.querySelector('.progress-bar');
-            const progressFill = document.querySelector('.progress-fill');
-            
-            if (show) {
-                progressBar.style.display = 'block';
-                progressFill.style.width = '100%';
-            } else {
-                setTimeout(() => {
-                    progressBar.style.display = 'none';
-                    progressFill.style.width = '0%';
-                }, 500);
-            }
-        }
-
-        function updateGeneratedFilesList() {
-            const container = document.getElementById('generated-files-list');
-            container.innerHTML = '';
-            
-            if (generatedFiles.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">暂无生成的文件</div>';
-                return;
-            }
-            
-            generatedFiles.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <div class="file-info">
-                        <div class="file-name">${file.filename}</div>
-                        <div class="file-details">大小: ${file.formatted_size} | 类型: ${file.content_type} | 创建时间: ${file.created_at}</div>
-                    </div>
-                    <div class="file-actions">
-                        <button class="btn-small btn-download" onclick="downloadFile('${file.filename}')">下载</button>
-                        <button class="btn-small btn-delete" onclick="deleteGeneratedFile(${index})">删除</button>
-                    </div>
-                `;
-                container.appendChild(fileItem);
-            });
-        }
-
-        function downloadFile(filename) {
-            window.open(`/api/file-generator/download/${filename}`, '_blank');
-        }
-
-        function deleteGeneratedFile(index) {
-            const file = generatedFiles[index];
-            
-            fetch(`/api/file-generator/delete/${file.filename}`, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    generatedFiles.splice(index, 1);
-                    updateGeneratedFilesList();
-                    showGeneratorMessage(`文件 ${file.filename} 删除成功`, 'success');
-                } else {
-                    showGeneratorMessage(`删除失败: ${data.message}`, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error deleting file:', error);
-                showGeneratorMessage('删除文件时发生错误', 'error');
-            });
-        }
-
-        function loadGeneratedFiles() {
-            fetch('/api/file-generator/files')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        generatedFiles = data.files || [];
-                        updateGeneratedFilesList();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading generated files:', error);
-                });
-        }
-
         // 页面加载完成
         window.addEventListener('load', function() {
             connectWebSocket();
             addLogEntry('info', '系统启动', 'CastRay系统界面已加载');
-            // 初始化文件生成器
-            loadGeneratedFiles();
-            
-            // 监听演示文件选择变化
-            document.getElementById('demoFile').addEventListener('change', function() {
-                const customSection = document.getElementById('customFileSection');
-                if (this.value === 'custom') {
-                    customSection.style.display = 'block';
-                    customSection.classList.add('show');
-                } else {
-                    customSection.style.display = 'none';
-                    customSection.classList.remove('show');
-                }
-            });
         });
 
         // 页面卸载时清理
@@ -1525,107 +1042,6 @@
                 ws.close();
             }
         });
-
-        // 创建自定义测试文件
-        function createCustomTestFile() {
-            const size = document.getElementById('customFileSize').value;
-            const unit = document.getElementById('customFileSizeUnit').value;
-            
-            if (!size || isNaN(size) || size <= 0) {
-                showCustomFileStatus('请输入有效的文件大小', 'error');
-                return;
-            }
-            
-            if (unit === 'GB' && size > 10) {
-                showCustomFileStatus('文件大小不能超过10GB', 'error');
-                return;
-            }
-            
-            if (unit === 'MB' && size > 10240) {
-                showCustomFileStatus('文件大小不能超过10GB', 'error');
-                return;
-            }
-            
-            const sizeStr = size + unit;
-            showCustomFileStatus('正在创建测试文件...', 'loading');
-            
-            fetch('/api/file-generator/create-demo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    size: sizeStr,
-                    content_type: 'random'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showCustomFileStatus(`✅ 测试文件创建成功！文件: ${data.filename} (${data.formatted_size})`, 'success');
-                    
-                    // 将新创建的文件添加到演示文件选择器中
-                    const demoFileSelect = document.getElementById('demoFile');
-                    
-                    // 移除之前的自定义文件选项（如果存在）
-                    const existingCustom = demoFileSelect.querySelector('option[data-custom="true"]');
-                    if (existingCustom) {
-                        existingCustom.remove();
-                    }
-                    
-                    // 添加新的自定义文件选项
-                    const newOption = document.createElement('option');
-                    newOption.value = data.filename;
-                    newOption.textContent = `🎯 ${data.filename} (${data.formatted_size})`;
-                    newOption.setAttribute('data-custom', 'true');
-                    
-                    // 插入到"创建自定义大小文件"选项之前
-                    const customOption = demoFileSelect.querySelector('option[value="custom"]');
-                    demoFileSelect.insertBefore(newOption, customOption);
-                    
-                    // 自动选择新创建的文件
-                    demoFileSelect.value = data.filename;
-                    
-                    // 隐藏自定义文件输入区域
-                    const customSection = document.getElementById('customFileSection');
-                    customSection.style.display = 'none';
-                    customSection.classList.remove('show');
-                    
-                } else {
-                    showCustomFileStatus(`❌ 创建失败: ${data.message}`, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error creating custom test file:', error);
-                showCustomFileStatus('❌ 创建文件时发生网络错误', 'error');
-            });
-        }
-
-        function showCustomFileStatus(message, type) {
-            const section = document.getElementById('customFileSection');
-            
-            // 移除之前的状态消息
-            const existingStatus = section.querySelector('.custom-file-status');
-            if (existingStatus) {
-                existingStatus.remove();
-            }
-            
-            // 创建新的状态消息
-            const statusDiv = document.createElement('div');
-            statusDiv.className = `custom-file-status custom-file-${type}`;
-            statusDiv.textContent = message;
-            
-            section.appendChild(statusDiv);
-            
-            // 自动清除成功和错误消息
-            if (type === 'success' || type === 'error') {
-                setTimeout(() => {
-                    if (section.contains(statusDiv)) {
-                        section.removeChild(statusDiv);
-                    }
-                }, 5000);
-            }
-        }
     </script>
 </body>
 </html>
