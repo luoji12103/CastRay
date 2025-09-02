@@ -21,7 +21,22 @@ logger = logging.getLogger(__name__)
 
 # 加载配置文件
 def load_config():
-    """根据操作系统加载相应的配置文件"""
+    """根据操作系统和环境变量加载相应的配置文件"""
+    
+    # 首先检查环境变量指定的配置文件
+    env_config = os.environ.get('CASTRAY_CONFIG')
+    if env_config:
+        config_path = Path(env_config)
+        if config_path.exists():
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    logger.info(f"已加载环境变量指定的配置文件: {config_path}")
+                    return config
+            except Exception as e:
+                logger.warning(f"环境变量配置文件 {config_path} 加载失败: {e}")
+    
+    # 按操作系统查找配置文件
     if platform.system() == "Linux":
         # Linux环境配置
         config_paths = [
@@ -282,6 +297,197 @@ async def get_node_messages(node_id: str, count: int = 50):
     """获取节点消息"""
     messages = await cluster.get_node_messages(node_id, count)
     return messages
+
+@app.post("/api/cluster/discover-external")
+async def discover_external_clusters():
+    """发现并连接外部Ray集群"""
+    try:
+        from ray_cluster_discovery import discover_and_connect_external_clusters
+        
+        result = discover_and_connect_external_clusters()
+        
+        if result.get('success'):
+            # 将发现的外部节点添加到集群管理器
+            external_nodes = result.get('external_nodes', {})
+            cluster.external_nodes.update(external_nodes)
+            
+            # 广播更新到WebSocket客户端
+            if websocket_connections:
+                notification = {
+                    "type": "external_cluster_discovered",
+                    "data": {
+                        "discovered_clusters": result.get('discovered_clusters', []),
+                        "external_nodes_count": len(external_nodes)
+                    }
+                }
+                for ws in websocket_connections:
+                    try:
+                        await ws.send_text(json.dumps(notification))
+                    except:
+                        pass
+        
+        return result
+        
+    except ImportError:
+        raise HTTPException(status_code=501, detail="外部集群发现功能不可用")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"发现外部集群失败: {str(e)}")
+
+@app.get("/api/cluster/external-info")
+async def get_external_cluster_info():
+    """获取外部集群信息"""
+    try:
+        from ray_cluster_discovery import cluster_connector
+        
+        return {
+            "is_connected": cluster_connector.is_connected_to_external_cluster(),
+            "external_nodes": cluster_connector.get_external_nodes(),
+            "connected_cluster": getattr(cluster_connector, 'connected_cluster', None)
+        }
+        
+    except ImportError:
+        return {
+            "is_connected": False,
+            "external_nodes": {},
+            "connected_cluster": None,
+            "error": "外部集群发现功能不可用"
+        }
+    except Exception as e:
+        return {
+            "is_connected": False,
+            "external_nodes": {},
+            "connected_cluster": None,
+            "error": str(e)
+        }
+
+@app.get("/api/nodes/external")
+async def get_external_nodes():
+    """获取外部集群节点列表"""
+    try:
+        # 从集群管理器获取外部节点
+        external_nodes = getattr(cluster, 'external_nodes', {})
+        
+        # 格式化节点信息
+        formatted_nodes = []
+        for node_id, node_info in external_nodes.items():
+            formatted_nodes.append({
+                "id": node_id,
+                "address": node_info.get('address', 'unknown'),
+                "status": node_info.get('status', 'unknown'),
+                "type": "external",
+                "cluster_source": node_info.get('cluster_source', 'unknown'),
+                "last_seen": node_info.get('last_seen')
+            })
+        
+        return {
+            "success": True,
+            "external_nodes": formatted_nodes,
+            "count": len(formatted_nodes)
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "external_nodes": [],
+            "count": 0,
+            "error": str(e)
+        }
+
+@app.post("/api/cluster/connect-external")
+async def connect_to_external_cluster(request: dict):
+    """手动连接到指定的外部集群"""
+    try:
+        from ray_cluster_discovery import cluster_connector
+        
+        cluster_address = request.get('cluster_address')
+        if not cluster_address:
+            raise HTTPException(status_code=400, detail="缺少cluster_address参数")
+        
+        # 构造集群信息
+        cluster_info = {
+            'dashboard_url': cluster_address if cluster_address.startswith('http') else f'http://{cluster_address}:8265',
+            'address': cluster_address,
+            'nodes': 1  # 假设至少有一个节点
+        }
+        
+        # 尝试连接到指定集群
+        success = cluster_connector.connect_to_external_cluster(cluster_info)
+        
+        if success:
+            # 获取外部节点信息
+            external_nodes = cluster_connector.get_external_nodes()
+            cluster.external_nodes.update(external_nodes)
+            
+            # 广播更新
+            if websocket_connections:
+                notification = {
+                    "type": "external_cluster_connected",
+                    "data": {
+                        "cluster_address": cluster_address,
+                        "external_nodes_count": len(external_nodes)
+                    }
+                }
+                for ws in websocket_connections:
+                    try:
+                        await ws.send_text(json.dumps(notification))
+                    except:
+                        pass
+            
+            return {
+                "success": True,
+                "message": f"成功连接到外部集群: {cluster_address}",
+                "external_nodes": external_nodes
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"连接外部集群失败: {cluster_address}"
+            }
+        
+    except ImportError:
+        raise HTTPException(status_code=501, detail="外部集群连接功能不可用")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"连接外部集群失败: {str(e)}")
+
+@app.delete("/api/cluster/disconnect-external")
+async def disconnect_external_cluster():
+    """断开外部集群连接"""
+    try:
+        from ray_cluster_discovery import cluster_connector
+        
+        # 检查是否有连接的外部集群
+        if cluster_connector.is_connected_to_external_cluster():
+            # 清除外部节点
+            cluster.external_nodes.clear()
+            cluster_connector.external_nodes.clear()
+            cluster_connector.connected_cluster = None
+            
+            # 广播更新
+            if websocket_connections:
+                notification = {
+                    "type": "external_cluster_disconnected",
+                    "data": {"message": "外部集群连接已断开"}
+                }
+                for ws in websocket_connections:
+                    try:
+                        await ws.send_text(json.dumps(notification))
+                    except:
+                        pass
+            
+            return {
+                "success": True,
+                "message": "外部集群连接已断开"
+            }
+        else:
+            return {
+                "success": False,
+                "message": "没有连接的外部集群"
+            }
+        
+    except ImportError:
+        raise HTTPException(status_code=501, detail="外部集群断连功能不可用")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"断开外部集群失败: {str(e)}")
 
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):

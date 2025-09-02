@@ -13,6 +13,22 @@ from models import CastMessage, CastType, MessageType, CastResponse, NodeStatus
 from file_transfer import FileTransferManager, FileTransferMessage, FileTransferProtocol
 import logging
 
+# 导入集群发现模块
+try:
+    from ray_cluster_discovery import discover_and_connect_external_clusters, cluster_connector
+except ImportError:
+    # 如果导入失败，提供空的替代函数
+    def discover_and_connect_external_clusters():
+        return {'discovered_clusters': [], 'external_nodes': {}, 'success': False}
+    
+    class DummyConnector:
+        def get_external_nodes(self):
+            return {}
+        def is_connected_to_external_cluster(self):
+            return False
+    
+    cluster_connector = DummyConnector()
+
 # 配置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -539,16 +555,41 @@ class CastingCluster:
     def __init__(self):
         self.nodes: Dict[str, Any] = {}  # Ray actor handles
         self.node_ports: Dict[str, int] = {}
+        self.external_nodes: Dict[str, Dict] = {}  # 外部节点信息
         self.is_initialized = False
         
     async def initialize_ray(self, ray_address: Optional[str] = None, namespace: str = "castray"):
         """初始化Ray集群连接"""
         try:
-            # 使用新的连接函数
+            # 首先尝试发现外部Ray集群
+            external_discovery_result = None
+            if ray_address in ['auto', None] or os.environ.get('DISCOVER_EXTERNAL_CLUSTERS', '').lower() == 'true':
+                logger.info("🔍 尝试发现外部Ray集群...")
+                external_discovery_result = discover_and_connect_external_clusters()
+                
+                if external_discovery_result.get('success'):
+                    logger.info("✅ 已连接到外部Ray集群")
+                    self.is_initialized = True
+                    
+                    # 加载外部节点
+                    external_nodes = external_discovery_result.get('external_nodes', {})
+                    self.external_nodes.update(external_nodes)
+                    
+                    logger.info(f"发现 {len(external_nodes)} 个外部节点")
+                    return True
+                else:
+                    logger.info(f"未发现外部集群: {external_discovery_result.get('error', 'unknown')}")
+            
+            # 如果没有发现外部集群，使用原有的连接逻辑
             success = connect_to_ray_cluster(ray_address, namespace)
             if success:
                 self.is_initialized = True
                 logger.info("Ray集群初始化成功")
+                
+                # 如果连接到外部集群，尝试发现现有节点
+                if ray_address and ray_address not in ['auto', 'local', None]:
+                    await self.discover_existing_nodes()
+                
                 return True
             else:
                 logger.error("Ray集群初始化失败")
@@ -563,6 +604,77 @@ class CastingCluster:
             except Exception as e2:
                 logger.error(f"Ray本地模式初始化也失败: {e2}")
                 return False
+    
+    async def discover_existing_nodes(self):
+        """发现Ray集群中的现有节点和Actor"""
+        try:
+            logger.info("发现Ray集群中的现有节点...")
+            
+            # 获取集群信息
+            cluster_resources = ray.cluster_resources()
+            available_resources = ray.available_resources()
+            nodes = ray.nodes()
+            
+            logger.info(f"Ray集群信息: {len(nodes)} 个节点, CPU: {cluster_resources.get('CPU', 0)}")
+            
+            # 尝试列出现有的Named Actor
+            try:
+                # 简化的Actor发现逻辑
+                import ray.util.state as state
+                actors = state.list_actors()
+                logger.info(f"发现 {len(actors)} 个现有Actor")
+                
+                for i, actor in enumerate(actors):
+                    try:
+                        # 安全地访问actor属性
+                        actor_dict = actor.__dict__ if hasattr(actor, '__dict__') else {}
+                        state_val = getattr(actor, 'state', 'UNKNOWN')
+                        name_val = getattr(actor, 'name', f'actor_{i}')
+                        class_name_val = getattr(actor, 'class_name', 'unknown')
+                        
+                        if state_val == 'ALIVE' and name_val:
+                            # 检查是否为相关的Actor类型
+                            if any(keyword in str(class_name_val) for keyword in ['DemoNode', 'CastingNode', 'Node']):
+                                logger.info(f"发现可能的传输Actor: {name_val} ({class_name_val})")
+                                
+                                # 为外部Actor创建代理条目
+                                if name_val not in self.nodes:
+                                    self.external_nodes[name_val] = {
+                                        'actor_id': getattr(actor, 'actor_id', ''),
+                                        'class_name': class_name_val,
+                                        'state': state_val,
+                                        'node_id': getattr(actor, 'node_id', ''),
+                                        'is_external': True,
+                                        'is_ray_node': False
+                                    }
+                                    logger.info(f"已记录外部Actor: {name_val}")
+                    except Exception as actor_error:
+                        logger.debug(f"处理Actor {i} 时出错: {actor_error}")
+                        continue
+                
+            except Exception as e:
+                logger.warning(f"无法列出现有Actor: {e}")
+            
+            # 根据Ray物理节点创建虚拟传输节点
+            node_count = 0
+            for node in nodes:
+                if node.get('Alive', False):
+                    node_id = f"ray_node_{node_count + 1}"
+                    # 为Ray节点创建虚拟条目（不是真正的CastingNode Actor）
+                    self.external_nodes[node_id] = {
+                        'ray_node_id': node.get('NodeID', ''),
+                        'resources': node.get('Resources', {}),
+                        'alive': node.get('Alive', False),
+                        'is_ray_node': True,
+                        'is_external': True
+                    }
+                    node_count += 1
+                    logger.info(f"映射Ray节点为传输节点: {node_id}")
+            
+            logger.info(f"发现 {len(self.external_nodes)} 个外部节点")
+            
+        except Exception as e:
+            logger.error(f"发现现有节点失败: {e}")
     
     async def create_node(self, node_id: str, port: int = 0) -> bool:
         """创建新节点"""
@@ -688,6 +800,8 @@ class CastingCluster:
         """获取集群状态"""
         try:
             node_statuses = []
+            
+            # 获取自建节点状态
             for node_id, node_ref in self.nodes.items():
                 try:
                     status = await node_ref.get_status.remote()
@@ -699,6 +813,45 @@ class CastingCluster:
                         "error": "无法获取状态"
                     })
             
+            # 添加外部节点状态
+            for node_id, node_info in self.external_nodes.items():
+                if node_info.get('is_ray_node'):
+                    # Ray物理节点
+                    node_statuses.append({
+                        "node_id": node_id,
+                        "is_running": node_info.get('alive', False),
+                        "port": "N/A",
+                        "node_type": "Ray节点",
+                        "resources": node_info.get('resources', {}),
+                        "received_count": 0,
+                        "sent_count": 0,
+                        "auto_transfer_enabled": False,
+                        "auto_transfer_queue": 0,
+                        "file_transfer_stats": {
+                            "successful_transfers": 0,
+                            "failed_transfers": 0,
+                            "bytes_transferred": 0
+                        }
+                    })
+                else:
+                    # 外部Actor节点
+                    node_statuses.append({
+                        "node_id": node_id,
+                        "is_running": node_info.get('state') == 'ALIVE',
+                        "port": "N/A",
+                        "node_type": "外部Actor",
+                        "class_name": node_info.get('class_name', 'unknown'),
+                        "received_count": 0,
+                        "sent_count": 0,
+                        "auto_transfer_enabled": False,
+                        "auto_transfer_queue": 0,
+                        "file_transfer_stats": {
+                            "successful_transfers": 0,
+                            "failed_transfers": 0,
+                            "bytes_transferred": 0
+                        }
+                    })
+
             ray_status = {}
             try:
                 if ray.is_initialized():
@@ -709,10 +862,13 @@ class CastingCluster:
                     }
             except:
                 ray_status = {"error": "无法获取Ray状态"}
-            
+
+            total_nodes = len(self.nodes) + len(self.external_nodes)
+            active_nodes = len([s for s in node_statuses if s.get("is_running", False)])
+
             return {
-                "total_nodes": len(self.nodes),
-                "active_nodes": len([s for s in node_statuses if s.get("is_running", False)]),
+                "total_nodes": total_nodes,
+                "active_nodes": active_nodes,
                 "node_statuses": node_statuses,
                 "ray_cluster": ray_status,
                 "node_ports": self.node_ports
