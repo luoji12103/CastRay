@@ -1106,12 +1106,34 @@
         function updateNodeSelects(nodes) {
             const senderSelect = document.getElementById('senderNode');
             const recipientsSelect = document.getElementById('recipients');
+            
+            // 保存当前选择状态
+            const currentSender = senderSelect.value;
+            const currentRecipients = Array.from(recipientsSelect.selectedOptions).map(option => option.value);
+            
             // 只显示Ray集群节点（即所有节点）
             const options = nodes.map(node => 
                 `<option value="${node.node_id}">${node.node_id}</option>`
             ).join('');
+            
+            // 更新发送节点选择
             senderSelect.innerHTML = '<option value="">选择发送节点</option>' + options;
+            
+            // 更新接收节点选择
             recipientsSelect.innerHTML = options;
+            
+            // 恢复之前的选择状态
+            if (currentSender && senderSelect.querySelector(`option[value="${currentSender}"]`)) {
+                senderSelect.value = currentSender;
+            }
+            
+            // 恢复接收节点的多选状态
+            currentRecipients.forEach(value => {
+                const option = recipientsSelect.querySelector(`option[value="${value}"]`);
+                if (option) {
+                    option.selected = true;
+                }
+            });
         }
 
         // 更新Ray集群信息

@@ -169,32 +169,37 @@ def parse_size_string(size_str: str) -> int:
     """
     size_str = size_str.strip().upper()
     
-    # 定义单位转换
-    units = {
-        'B': 1,
-        'KB': 1024,
-        'MB': 1024 * 1024,
-        'GB': 1024 * 1024 * 1024,
-        'TB': 1024 * 1024 * 1024 * 1024
-    }
+    # 定义单位转换（按长度从长到短排序，避免匹配错误）
+    units = [
+        ('TB', 1024 * 1024 * 1024 * 1024),
+        ('GB', 1024 * 1024 * 1024),
+        ('MB', 1024 * 1024),
+        ('KB', 1024),
+        ('B', 1)
+    ]
     
-    # 提取数字和单位
-    if size_str.endswith('B'):
-        for unit, multiplier in units.items():
-            if size_str.endswith(unit):
-                number_part = size_str[:-len(unit)].strip()
-                try:
-                    return int(float(number_part) * multiplier)
-                except ValueError:
-                    raise ValueError(f"Invalid size format: {size_str}")
-    else:
-        # 默认为字节
-        try:
-            return int(size_str)
-        except ValueError:
-            raise ValueError(f"Invalid size format: {size_str}")
+    # 检查每个单位
+    for unit, multiplier in units:
+        if size_str.endswith(unit):
+            number_part = size_str[:-len(unit)].strip()
+            try:
+                number = float(number_part)
+                if number < 0:
+                    raise ValueError(f"Size cannot be negative: {size_str}")
+                return int(number * multiplier)
+            except ValueError as e:
+                if "cannot be negative" in str(e):
+                    raise
+                raise ValueError(f"Invalid number in size format: {size_str}")
     
-    raise ValueError(f"Unsupported size format: {size_str}")
+    # 如果没有单位，默认为字节
+    try:
+        number = float(size_str)
+        if number < 0:
+            raise ValueError(f"Size cannot be negative: {size_str}")
+        return int(number)
+    except ValueError:
+        raise ValueError(f"Invalid size format: {size_str}")
 
 
 def format_size(size_bytes: int) -> str:
